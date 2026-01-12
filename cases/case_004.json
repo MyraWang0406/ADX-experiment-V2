@@ -1,0 +1,71 @@
+{
+  "experiment_id": "exp_004",
+  "title": "OCPX 倍率调整：CPA 稳定但倍率波动大",
+  "narrative": "调整 OCPX 倍率上限，CPA 保持稳定但倍率波动较大，需要优化控制策略。",
+  "primary_segment": {
+    "id": "all",
+    "name": "全量用户",
+    "dims": {}
+  },
+  "kpi_framework": {
+    "north_star": {
+      "name": "有效播放",
+      "unit": "次",
+      "baseline_value": 80000,
+      "treatment_value": 82000
+    },
+    "guardrails": [
+      {
+        "name": "CPA",
+        "unit": "元",
+        "baseline_value": 200,
+        "treatment_value": 205
+      }
+    ]
+  },
+  "pipeline": {
+    "bottlenecks": [
+      {
+        "stage": "auction",
+        "type": "Control",
+        "symptom": "OCPX 倍率波动大",
+        "impact": "控制不稳定",
+        "suggested_actions": [
+          "调整倍率上限/下限",
+          "增加稳定性正则",
+          "拆时段建模"
+        ]
+      }
+    ],
+    "ocpx_timeseries": {
+      "baseline": [
+        {"hour": 0, "multiplier": 1.0, "actual_cpa": 200},
+        {"hour": 1, "multiplier": 1.05, "actual_cpa": 195},
+        {"hour": 2, "multiplier": 0.95, "actual_cpa": 205}
+      ],
+      "treatment": [
+        {"hour": 0, "multiplier": 1.2, "actual_cpa": 200},
+        {"hour": 1, "multiplier": 0.8, "actual_cpa": 210},
+        {"hour": 2, "multiplier": 1.3, "actual_cpa": 195}
+      ]
+    }
+  },
+  "diagnosis_tree": {
+    "root": "OCPX 控制不稳",
+    "branches": [
+      {
+        "name": "倍率波动",
+        "evidence_fields": [
+          "pipeline.ocpx_timeseries.treatment[].multiplier"
+        ],
+        "actions": [
+          "调整倍率上限/下限",
+          "增加稳定性正则"
+        ]
+      }
+    ]
+  }
+}
+
+
+

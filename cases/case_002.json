@@ -1,0 +1,95 @@
+{
+  "experiment_id": "exp_002",
+  "title": "弱网场景目标重定义：时长 → 完播正目标 + 短播跳过负目标",
+  "narrative": "针对弱网用户，调整目标函数，以完播为正目标，短播跳过为负目标，提升弱网用户体验。",
+  "primary_segment": {
+    "id": "weak_network",
+    "name": "弱网用户",
+    "dims": {
+      "network": "weak",
+      "device": "low-end"
+    }
+  },
+  "kpi_framework": {
+    "north_star": {
+      "name": "完播率",
+      "unit": "%",
+      "baseline_value": 0.35,
+      "treatment_value": 0.42
+    },
+    "guardrails": [
+      {
+        "name": "超时率",
+        "unit": "%",
+        "baseline_value": 0.25,
+        "treatment_value": 0.18
+      },
+      {
+        "name": "投诉率",
+        "unit": "‰",
+        "baseline_value": 2.5,
+        "treatment_value": 1.8
+      }
+    ]
+  },
+  "pipeline": {
+    "bottlenecks": [
+      {
+        "stage": "fine",
+        "type": "Quality",
+        "symptom": "弱网场景模型预测偏差",
+        "impact": "完播率不达标",
+        "suggested_actions": [
+          "优化弱网特征工程",
+          "调整目标权重",
+          "增加弱网样本"
+        ]
+      }
+    ],
+    "funnel": {
+      "baseline": {
+        "pool": 500000,
+        "after_recall": 300000,
+        "after_coarse": 150000,
+        "after_fine": 80000,
+        "final": 35000
+      },
+      "treatment": {
+        "pool": 500000,
+        "after_recall": 300000,
+        "after_coarse": 150000,
+        "after_fine": 90000,
+        "final": 42000
+      }
+    },
+    "auction": {
+      "baseline": {
+        "timeout_rate": 0.25,
+        "fill_rate": 0.70
+      },
+      "treatment": {
+        "timeout_rate": 0.18,
+        "fill_rate": 0.75
+      }
+    }
+  },
+  "diagnosis_tree": {
+    "root": "弱网完播率不达标",
+    "branches": [
+      {
+        "name": "模型预测偏差",
+        "evidence_fields": [
+          "pipeline.funnel.after_fine",
+          "pipeline.auction.timeout_rate"
+        ],
+        "actions": [
+          "优化弱网特征工程",
+          "调整目标权重"
+        ]
+      }
+    ]
+  }
+}
+
+
+

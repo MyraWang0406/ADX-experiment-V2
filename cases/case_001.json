@@ -1,0 +1,101 @@
+{
+  "experiment_id": "exp_001",
+  "title": "新增年轻内容召回，修复新用户画风偏老",
+  "narrative": "针对新用户群体，新增年轻化内容召回源，优化画风分布，提升新用户留存和完播率。",
+  "primary_segment": {
+    "id": "new_user",
+    "name": "新用户",
+    "dims": {
+      "age": "18-25",
+      "interest": "学习"
+    }
+  },
+  "kpi_framework": {
+    "north_star": {
+      "name": "有效播放",
+      "unit": "次",
+      "baseline_value": 50000,
+      "treatment_value": 55000
+    },
+    "guardrails": [
+      {
+        "name": "次日留存",
+        "unit": "%",
+        "baseline_value": 0.45,
+        "treatment_value": 0.48
+      },
+      {
+        "name": "早退率",
+        "unit": "%",
+        "baseline_value": 0.15,
+        "treatment_value": 0.14
+      }
+    ]
+  },
+  "pipeline": {
+    "bottlenecks": [
+      {
+        "stage": "recall",
+        "type": "Coverage",
+        "symptom": "新用户年轻内容召回不足",
+        "impact": "画风偏老，留存下降",
+        "suggested_actions": [
+          "增加年轻化内容召回源",
+          "调整召回权重",
+          "监控新用户留存"
+        ]
+      }
+    ],
+    "funnel": {
+      "baseline": {
+        "pool": 1000000,
+        "after_recall": 500000,
+        "after_coarse": 200000,
+        "after_fine": 100000,
+        "final": 50000
+      },
+      "treatment": {
+        "pool": 1000000,
+        "after_recall": 550000,
+        "after_coarse": 220000,
+        "after_fine": 110000,
+        "final": 55000
+      }
+    },
+    "category_dist": {
+      "baseline": {
+        "学习": 0.3,
+        "娱乐": 0.2,
+        "职场": 0.2,
+        "情感": 0.15,
+        "其他": 0.15
+      },
+      "treatment": {
+        "学习": 0.35,
+        "娱乐": 0.25,
+        "职场": 0.15,
+        "情感": 0.1,
+        "其他": 0.15
+      }
+    }
+  },
+  "diagnosis_tree": {
+    "root": "新用户画风偏老",
+    "branches": [
+      {
+        "name": "召回源不足",
+        "evidence_fields": [
+          "pipeline.funnel.after_recall",
+          "pipeline.category_dist"
+        ],
+        "actions": [
+          "增加年轻化内容召回源",
+          "调整召回权重"
+        ]
+      }
+    ]
+  }
+}
+
+
+

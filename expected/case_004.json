@@ -1,0 +1,38 @@
+{
+  "conclusion": "实验基本达到预期，有效播放提升2.5%，CPA 保持稳定（仅上升2.5%），但 OCPX 倍率波动较大，控制稳定性不足。倍率在 0.8-1.3 之间波动，需要优化控制策略以提升稳定性。",
+  "evidence_paths": [
+    "kpi_framework.north_star.baseline_value",
+    "kpi_framework.north_star.treatment_value",
+    "kpi_framework.guardrails[0].treatment_value",
+    "pipeline.ocpx_timeseries.treatment[].multiplier",
+    "pipeline.ocpx_timeseries.treatment[].actual_cpa",
+    "pipeline.bottlenecks[0].stage",
+    "pipeline.bottlenecks[0].symptom"
+  ],
+  "recommended_actions": [
+    {
+      "action": "调整倍率上限/下限",
+      "owner": "算法",
+      "validation": "观察倍率波动范围和 CPA 稳定性",
+      "risk": "中",
+      "monitoring": "倍率标准差、CPA 方差"
+    },
+    {
+      "action": "增加稳定性正则",
+      "owner": "算法",
+      "validation": "监控倍率波动幅度",
+      "risk": "低",
+      "monitoring": "倍率标准差"
+    },
+    {
+      "action": "拆时段建模",
+      "owner": "算法",
+      "validation": "观察不同时段的倍率分布",
+      "risk": "中",
+      "monitoring": "分时段倍率、CPA"
+    }
+  ]
+}
+
+
+

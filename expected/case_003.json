@@ -1,0 +1,41 @@
+{
+  "conclusion": "实验部分达到预期，收入提升15%，但填充率下降13个百分点，超时率上升7个百分点，护栏指标出现风险。拍卖环节存在明显卡点，底价过高导致 BID_TOO_LOW 和 TIMEOUT 原因增加，需要回调底价策略并优化超时处理。",
+  "evidence_paths": [
+    "kpi_framework.north_star.baseline_value",
+    "kpi_framework.north_star.treatment_value",
+    "kpi_framework.guardrails[0].treatment_value",
+    "kpi_framework.guardrails[0].baseline_value",
+    "pipeline.auction.baseline.win_rate",
+    "pipeline.auction.treatment.win_rate",
+    "pipeline.auction.baseline.timeout_rate",
+    "pipeline.auction.treatment.timeout_rate",
+    "pipeline.reasons.baseline.auction.BID_TOO_LOW",
+    "pipeline.reasons.treatment.auction.BID_TOO_LOW",
+    "pipeline.bottlenecks[0].stage",
+    "pipeline.bottlenecks[0].symptom"
+  ],
+  "recommended_actions": [
+    {
+      "action": "回调底价策略",
+      "owner": "商业化",
+      "validation": "观察填充率和收入变化",
+      "risk": "高",
+      "monitoring": "填充率、收入、超时率"
+    },
+    {
+      "action": "优化超时阈值",
+      "owner": "工程",
+      "validation": "监控超时率和拍卖成功率",
+      "risk": "中",
+      "monitoring": "超时率、win_rate"
+    },
+    {
+      "action": "调整预算节奏",
+      "owner": "运营",
+      "validation": "观察预算消耗分布",
+      "risk": "低",
+      "monitoring": "预算消耗、填充率"
+    }
+  ]
+}
+

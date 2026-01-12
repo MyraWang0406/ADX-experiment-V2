@@ -1,0 +1,34 @@
+{
+  "conclusion": "实验达到预期目标，完播率提升7个百分点，弱网用户体验显著改善。超时率下降7个百分点，投诉率下降0.7‰，护栏指标表现优秀。但弱网场景模型预测仍存在偏差，需要进一步优化。",
+  "evidence_paths": [
+    "kpi_framework.north_star.baseline_value",
+    "kpi_framework.north_star.treatment_value",
+    "pipeline.funnel.baseline.after_fine",
+    "pipeline.funnel.treatment.after_fine",
+    "pipeline.auction.baseline.timeout_rate",
+    "pipeline.auction.treatment.timeout_rate",
+    "pipeline.bottlenecks[0].stage",
+    "pipeline.bottlenecks[0].symptom"
+  ],
+  "recommended_actions": [
+    {
+      "action": "优化弱网特征工程",
+      "owner": "算法",
+      "validation": "观察弱网用户完播率变化",
+      "risk": "中"
+    },
+    {
+      "action": "调整目标权重",
+      "owner": "算法",
+      "validation": "监控完播率和短播跳过率",
+      "risk": "中"
+    },
+    {
+      "action": "增加弱网样本",
+      "owner": "工程",
+      "validation": "检查训练数据中弱网样本占比",
+      "risk": "低"
+    }
+  ]
+}
+

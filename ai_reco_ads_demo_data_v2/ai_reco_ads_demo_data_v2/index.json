@@ -1,0 +1,22 @@
+{
+  "dataset_name": "ai_reco_ads_demo_data_v2",
+  "version": "2.0",
+  "generated_at": "2026-01-09T09:30:00",
+  "experiments": [
+    {
+      "experiment_id": "exp_001",
+      "title": "新增年轻内容召回，修复新用户画风偏老",
+      "created_at": "2026-01-09T09:30:00"
+    },
+    {
+      "experiment_id": "exp_002",
+      "title": "弱网场景目标重定义：时长 → 完播正目标 + 短播跳过负目标",
+      "created_at": "2026-01-09T09:30:00"
+    },
+    {
+      "experiment_id": "exp_003",
+      "title": "提高底价 + 保量节奏调整：收入↑但 fill↓，定位拍卖卡点并修复",
+      "created_at": "2026-01-09T09:30:00"
+    }
+  ]
+}

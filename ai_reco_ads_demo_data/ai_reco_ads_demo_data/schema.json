@@ -1,0 +1,14 @@
+{
+  "experiment_report_schema": {
+    "experiment_id": "string",
+    "title": "string",
+    "created_at": "ISO8601",
+    "primary_segment": "object",
+    "narrative": "string",
+    "knobs": "object",
+    "pipeline": "object (funnel/latency/category_dist/reasons/auction/ocpx_timeseries/topN_feed/bottlenecks)",
+    "metrics_summary": "object (baseline/treatment)",
+    "breakdown": "object (by_segment/by_recall_source/by_hour)",
+    "diagnosis_tree": "object (root/branches)"
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "experiment_id": "exp_005",
+  "title": "质量过滤过严：CTR 下降但相关性提升",
+  "narrative": "加强质量过滤策略，CTR 下降但相关性提升，需要平衡质量和数量。",
+  "primary_segment": {
+    "id": "all",
+    "name": "全量用户",
+    "dims": {}
+  },
+  "kpi_framework": {
+    "north_star": {
+      "name": "有效播放",
+      "unit": "次",
+      "baseline_value": 60000,
+      "treatment_value": 55000
+    },
+    "guardrails": [
+      {
+        "name": "CTR",
+        "unit": "%",
+        "baseline_value": 3.5,
+        "treatment_value": 2.8
+      }
+    ]
+  },
+  "pipeline": {
+    "bottlenecks": [
+      {
+        "stage": "rerank",
+        "type": "Quality",
+        "symptom": "质量过滤过严",
+        "impact": "CTR 下降",
+        "suggested_actions": [
+          "放宽质量阈值",
+          "优化过滤策略",
+          "监控相关性指标"
+        ]
+      }
+    ],
+    "funnel": {
+      "baseline": {
+        "pool": 800000,
+        "after_recall": 500000,
+        "after_coarse": 250000,
+        "after_fine": 150000,
+        "final": 120000
+      },
+      "treatment": {
+        "pool": 800000,
+        "after_recall": 500000,
+        "after_coarse": 250000,
+        "after_fine": 120000,
+        "final": 96000
+      }
+    },
+    "reasons": {
+      "baseline": {
+        "rerank": {
+          "FILTERED_BY_QUALITY": 0.20
+        }
+      },
+      "treatment": {
+        "rerank": {
+          "FILTERED_BY_QUALITY": 0.35
+        }
+      }
+    }
+  },
+  "diagnosis_tree": {
+    "root": "CTR 下降",
+    "branches": [
+      {
+        "name": "质量过滤过严",
+        "evidence_fields": [
+          "pipeline.funnel.after_fine",
+          "pipeline.reasons.treatment.rerank.FILTERED_BY_QUALITY"
+        ],
+        "actions": [
+          "放宽质量阈值",
+          "优化过滤策略"
+        ]
+      }
+    ]
+  }
+}
+
+
+

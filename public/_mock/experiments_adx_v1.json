@@ -1,0 +1,712 @@
+{
+  "last_updated": "2026-01-09 09:30",
+  "experiments": [
+    {
+      "id": "exp_001",
+      "title": "新增年轻内容召回，修复新用户画像风偏差",
+      "goal": "视频播放量",
+      "status": "abnormal",
+      "risk_level": 2,
+      "bottleneck": "recall",
+      "lift_pct": 26.3,
+      "summary": {
+        "north_star": {
+          "name": "北极星",
+          "baseline": 200279,
+          "treatment": 252907,
+          "lift_pct": 26.3
+        },
+        "guardrails": [
+          {
+            "name": "早退率",
+            "trend": "up"
+          },
+          {
+            "name": "投诉率",
+            "trend": "up"
+          }
+        ],
+        "ceiling": {
+          "current": 26.3,
+          "ceiling": 45.0,
+          "gap": 18.7,
+          "limit_reason": "recall+latency"
+        },
+        "key_takeaway": "召回量提升带来播放提升，但延迟/超时上升影响 fill/CTR/收入"
+      },
+      "query_intent": {
+        "insight": "新用户(18-24)画像偏老，学习/职场内容占比不足导致首刷停留与 CTR 低",
+        "top_queries": [
+          {
+            "rank": 1,
+            "query": "产品经理入门",
+            "intent": "学习",
+            "impressions": 125000,
+            "ctr": 0.032,
+            "cvr": 0.015,
+            "cost": 8500,
+            "revenue": 12000
+          },
+          {
+            "rank": 2,
+            "query": "面试怎么准备",
+            "intent": "求职",
+            "impressions": 98000,
+            "ctr": 0.028,
+            "cvr": 0.012,
+            "cost": 7200,
+            "revenue": 9500
+          },
+          {
+            "rank": 3,
+            "query": "职场沟通",
+            "intent": "职场",
+            "impressions": 87000,
+            "ctr": 0.025,
+            "cvr": 0.01,
+            "cost": 6500,
+            "revenue": 8200
+          }
+        ],
+        "intent_mix": [
+          {
+            "intent": "学习",
+            "share": 0.25,
+            "ctr": 0.03,
+            "cvr": 0.014
+          },
+          {
+            "intent": "求职",
+            "share": 0.2,
+            "ctr": 0.028,
+            "cvr": 0.012
+          },
+          {
+            "intent": "职场",
+            "share": 0.18,
+            "ctr": 0.025,
+            "cvr": 0.01
+          },
+          {
+            "intent": "时尚",
+            "share": 0.12,
+            "ctr": 0.035,
+            "cvr": 0.008
+          },
+          {
+            "intent": "本地生活",
+            "share": 0.1,
+            "ctr": 0.03,
+            "cvr": 0.02
+          },
+          {
+            "intent": "其他",
+            "share": 0.15,
+            "ctr": 0.025,
+            "cvr": 0.01
+          }
+        ],
+        "match_effect": {
+          "baseline": 0.62,
+          "treatment": 0.69
+        },
+        "post_click_cvr": {
+          "baseline": 0.028,
+          "treatment": 0.029
+        }
+      },
+      "pipeline": {
+        "stages": [
+          {
+            "name": "召回",
+            "latency_ms": {
+              "baseline": 6,
+              "treatment": 13
+            },
+            "candidates": {
+              "baseline": 15000,
+              "treatment": 22000
+            },
+            "note": "延迟上升/超时，影响 fill/CTR/收入"
+          },
+          {
+            "name": "粗排",
+            "latency_ms": {
+              "baseline": 8,
+              "treatment": 10
+            },
+            "candidates": {
+              "baseline": 260,
+              "treatment": 310
+            }
+          },
+          {
+            "name": "精排",
+            "latency_ms": {
+              "baseline": 28,
+              "treatment": 31
+            },
+            "candidates": {
+              "baseline": 28,
+              "treatment": 33
+            }
+          },
+          {
+            "name": "重排",
+            "latency_ms": {
+              "baseline": 4,
+              "treatment": 6
+            },
+            "candidates": {
+              "baseline": 30,
+              "treatment": 30
+            }
+          },
+          {
+            "name": "拍卖",
+            "latency_ms": {
+              "baseline": 6,
+              "treatment": 7
+            },
+            "candidates": {
+              "baseline": 0.86,
+              "treatment": 0.85
+            }
+          }
+        ]
+      },
+      "bidding_budget": {
+        "dsp": {
+          "ocpx": {
+            "baseline": 1.0,
+            "treatment": 1.05
+          },
+          "bid_multiplier": {
+            "baseline": 1.0,
+            "treatment": 1.08
+          },
+          "pacing": {
+            "mode": "even",
+            "early_hour_spend_cap": {
+              "baseline": 0.35,
+              "treatment": 0.4
+            }
+          },
+          "budget_exhausted_rate": {
+            "baseline": 0.08,
+            "treatment": 0.1
+          }
+        }
+      },
+      "supply_coverage": {
+        "ssp": {
+          "fill_rate": {
+            "baseline": 0.915,
+            "treatment": 0.889
+          },
+          "floor_ecpm": {
+            "baseline": 1.2,
+            "treatment": 1.25
+          },
+          "inventory_quality": {
+            "baseline": 0.82,
+            "treatment": 0.8
+          }
+        }
+      },
+      "adx_exchange": {
+        "adx": {
+          "bid_request_qps": {
+            "baseline": 1200,
+            "treatment": 1350
+          },
+          "bid_response_rate": {
+            "baseline": 0.94,
+            "treatment": 0.9
+          },
+          "timeout_rate": {
+            "baseline": 0.32,
+            "treatment": 0.36
+          },
+          "clearing_price_ecpm": {
+            "baseline": 1.35,
+            "treatment": 1.32
+          }
+        }
+      },
+      "reasons": {
+        "rerank": [
+          {
+            "code": "DIVERSITY_SWAP",
+            "owner": "Algo",
+            "baseline_pct": 0.18,
+            "treatment_pct": 0.26
+          },
+          {
+            "code": "FILTERED_BY_QUALITY",
+            "owner": "SSP",
+            "baseline_pct": 0.34,
+            "treatment_pct": 0.28
+          },
+          {
+            "code": "FILTERED_BY_DUP",
+            "owner": "Algo",
+            "baseline_pct": 0.22,
+            "treatment_pct": 0.2
+          }
+        ],
+        "auction": [
+          {
+            "code": "BID_TOO_LOW",
+            "owner": "DSP",
+            "baseline_pct": 0.46,
+            "treatment_pct": 0.42
+          },
+          {
+            "code": "TIMEOUT",
+            "owner": "ADX",
+            "baseline_pct": 0.32,
+            "treatment_pct": 0.36
+          },
+          {
+            "code": "BUDGET_EXHAUSTED",
+            "owner": "DSP",
+            "baseline_pct": 0.08,
+            "treatment_pct": 0.1
+          }
+        ]
+      },
+      "actions": [
+        {
+          "id": "a1",
+          "title": "分层定位：人群/供给/召回源/时段",
+          "owner": "Algo",
+          "validation": "离线模拟",
+          "evidence_fields": [
+            "coverage_breakdown.by_intent",
+            "coverage_breakdown.by_hour",
+            "pipeline.stages.召回.latency_ms"
+          ]
+        },
+        {
+          "id": "a2",
+          "title": "把“卡点”变成可量化过程指标（召回超时率/返回率）",
+          "owner": "ADX",
+          "validation": "离线模拟",
+          "evidence_fields": [
+            "adx_exchange.adx.bid_response_rate",
+            "adx_exchange.adx.timeout_rate",
+            "pipeline.stages.召回.latency_ms"
+          ]
+        },
+        {
+          "id": "a3",
+          "title": "上线前做离线模拟 + 小流量验证",
+          "owner": "Infra",
+          "validation": "小流量验证",
+          "evidence_fields": [
+            "guardrails",
+            "supply_coverage.ssp.fill_rate"
+          ]
+        },
+        {
+          "id": "a4",
+          "title": "提高出价 / ocpx 倍率或放宽目标",
+          "owner": "DSP",
+          "validation": "离线模拟",
+          "evidence_fields": [
+            "bidding_budget.dsp.bid_multiplier",
+            "reasons.auction.BID_TOO_LOW"
+          ]
+        },
+        {
+          "id": "a5",
+          "title": "检查预算节奏(pacing)是否过早打光",
+          "owner": "DSP",
+          "validation": "小流量验证",
+          "evidence_fields": [
+            "bidding_budget.dsp.budget_exhausted_rate",
+            "bidding_budget.dsp.pacing"
+          ]
+        }
+      ],
+      "coverage_breakdown": {
+        "by_intent": [
+          {
+            "key": "学习",
+            "baseline_fill": 0.92,
+            "treatment_fill": 0.89
+          },
+          {
+            "key": "求职",
+            "baseline_fill": 0.91,
+            "treatment_fill": 0.88
+          }
+        ],
+        "by_hour": [
+          {
+            "hour": 9,
+            "baseline_fill": 0.93,
+            "treatment_fill": 0.9
+          },
+          {
+            "hour": 21,
+            "baseline_fill": 0.9,
+            "treatment_fill": 0.86
+          }
+        ]
+      }
+    },
+    {
+      "id": "exp_002",
+      "title": "弱网场景目标重定义：时长 → 完播（正目标+短播跳过负目标）",
+      "goal": "完播率",
+      "status": "abnormal",
+      "risk_level": 2,
+      "bottleneck": "ranking",
+      "lift_pct": 91.0,
+      "summary": {
+        "north_star": {
+          "name": "北极星",
+          "baseline": 144651,
+          "treatment": 276300,
+          "lift_pct": 91.0
+        },
+        "guardrails": [
+          {
+            "name": "次日留存",
+            "trend": "flat"
+          },
+          {
+            "name": "投诉率",
+            "trend": "flat"
+          }
+        ],
+        "ceiling": {
+          "current": 91.0,
+          "ceiling": 110.0,
+          "gap": 19.0,
+          "limit_reason": "ranking+quality"
+        },
+        "key_takeaway": "弱网下目标更贴合体验，但精排质量门槛导致供给利用率下降"
+      },
+      "pipeline": {
+        "stages": [
+          {
+            "name": "召回",
+            "latency_ms": {
+              "baseline": 7,
+              "treatment": 9
+            },
+            "candidates": {
+              "baseline": 14000,
+              "treatment": 16000
+            }
+          },
+          {
+            "name": "粗排",
+            "latency_ms": {
+              "baseline": 9,
+              "treatment": 11
+            },
+            "candidates": {
+              "baseline": 250,
+              "treatment": 290
+            }
+          },
+          {
+            "name": "精排",
+            "latency_ms": {
+              "baseline": 26,
+              "treatment": 33
+            },
+            "candidates": {
+              "baseline": 26,
+              "treatment": 31
+            }
+          },
+          {
+            "name": "重排",
+            "latency_ms": {
+              "baseline": 4,
+              "treatment": 6
+            },
+            "candidates": {
+              "baseline": 30,
+              "treatment": 30
+            }
+          },
+          {
+            "name": "拍卖",
+            "latency_ms": {
+              "baseline": 6,
+              "treatment": 7
+            },
+            "candidates": {
+              "baseline": 0.88,
+              "treatment": 0.86
+            }
+          }
+        ]
+      },
+      "adx_exchange": {
+        "adx": {
+          "bid_request_qps": {
+            "baseline": 980,
+            "treatment": 1020
+          },
+          "bid_response_rate": {
+            "baseline": 0.95,
+            "treatment": 0.93
+          },
+          "timeout_rate": {
+            "baseline": 0.18,
+            "treatment": 0.21
+          },
+          "clearing_price_ecpm": {
+            "baseline": 1.1,
+            "treatment": 1.12
+          }
+        }
+      },
+      "supply_coverage": {
+        "ssp": {
+          "fill_rate": {
+            "baseline": 0.905,
+            "treatment": 0.892
+          },
+          "floor_ecpm": {
+            "baseline": 1.05,
+            "treatment": 1.05
+          },
+          "inventory_quality": {
+            "baseline": 0.84,
+            "treatment": 0.83
+          }
+        }
+      },
+      "bidding_budget": {
+        "dsp": {
+          "ocpx": {
+            "baseline": 1.0,
+            "treatment": 1.0
+          },
+          "bid_multiplier": {
+            "baseline": 1.0,
+            "treatment": 1.02
+          },
+          "pacing": {
+            "mode": "even",
+            "early_hour_spend_cap": {
+              "baseline": 0.3,
+              "treatment": 0.3
+            }
+          },
+          "budget_exhausted_rate": {
+            "baseline": 0.06,
+            "treatment": 0.06
+          }
+        }
+      },
+      "reasons": {
+        "rerank": [
+          {
+            "code": "FILTERED_BY_QUALITY",
+            "owner": "SSP",
+            "baseline_pct": 0.28,
+            "treatment_pct": 0.34
+          },
+          {
+            "code": "FILTERED_BY_DUP",
+            "owner": "Algo",
+            "baseline_pct": 0.18,
+            "treatment_pct": 0.2
+          }
+        ],
+        "auction": [
+          {
+            "code": "TIMEOUT",
+            "owner": "ADX",
+            "baseline_pct": 0.18,
+            "treatment_pct": 0.21
+          },
+          {
+            "code": "BID_TOO_LOW",
+            "owner": "DSP",
+            "baseline_pct": 0.22,
+            "treatment_pct": 0.21
+          }
+        ]
+      },
+      "actions": [
+        {
+          "id": "b1",
+          "title": "精排门槛分桶：弱网/强网分别设 quality gate",
+          "owner": "Algo",
+          "validation": "离线模拟",
+          "evidence_fields": [
+            "reasons.rerank.FILTERED_BY_QUALITY",
+            "pipeline.stages.精排.latency_ms"
+          ]
+        },
+        {
+          "id": "b2",
+          "title": "ADX 超时：排查 bidder 响应时延与网络重试策略",
+          "owner": "ADX",
+          "validation": "小流量验证",
+          "evidence_fields": [
+            "adx_exchange.adx.timeout_rate",
+            "adx_exchange.adx.bid_response_rate"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "exp_003",
+      "title": "提高底价 + 保量节奏调整：收入↑但 fill↓，定位拍卖卡点并修复",
+      "goal": "收入",
+      "status": "warning",
+      "risk_level": 1,
+      "bottleneck": "auction",
+      "lift_pct": 9.5,
+      "summary": {
+        "north_star": {
+          "name": "北极星",
+          "baseline": 212725,
+          "treatment": 232863,
+          "lift_pct": 9.5
+        },
+        "guardrails": [
+          {
+            "name": "填充率",
+            "trend": "down"
+          },
+          {
+            "name": "超时率",
+            "trend": "up"
+          }
+        ],
+        "ceiling": {
+          "current": 9.5,
+          "ceiling": 20.0,
+          "gap": 10.5,
+          "limit_reason": "auction+floor"
+        },
+        "key_takeaway": "floor 提升带来 eCPM 增长，但 DSP 出价不足和 ADX timeout 导致 fill 下滑"
+      },
+      "bidding_budget": {
+        "dsp": {
+          "ocpx": {
+            "baseline": 1.0,
+            "treatment": 1.0
+          },
+          "bid_multiplier": {
+            "baseline": 1.0,
+            "treatment": 0.98
+          },
+          "pacing": {
+            "mode": "aggressive_early",
+            "early_hour_spend_cap": {
+              "baseline": 0.4,
+              "treatment": 0.55
+            }
+          },
+          "budget_exhausted_rate": {
+            "baseline": 0.07,
+            "treatment": 0.12
+          }
+        }
+      },
+      "supply_coverage": {
+        "ssp": {
+          "fill_rate": {
+            "baseline": 0.92,
+            "treatment": 0.86
+          },
+          "floor_ecpm": {
+            "baseline": 1.1,
+            "treatment": 1.35
+          },
+          "inventory_quality": {
+            "baseline": 0.83,
+            "treatment": 0.82
+          }
+        }
+      },
+      "adx_exchange": {
+        "adx": {
+          "bid_request_qps": {
+            "baseline": 1500,
+            "treatment": 1480
+          },
+          "bid_response_rate": {
+            "baseline": 0.96,
+            "treatment": 0.92
+          },
+          "timeout_rate": {
+            "baseline": 0.14,
+            "treatment": 0.22
+          },
+          "clearing_price_ecpm": {
+            "baseline": 1.18,
+            "treatment": 1.4
+          }
+        }
+      },
+      "reasons": {
+        "auction": [
+          {
+            "code": "BID_TOO_LOW",
+            "owner": "DSP",
+            "baseline_pct": 0.36,
+            "treatment_pct": 0.48
+          },
+          {
+            "code": "TIMEOUT",
+            "owner": "ADX",
+            "baseline_pct": 0.14,
+            "treatment_pct": 0.22
+          },
+          {
+            "code": "BUDGET_EXHAUSTED",
+            "owner": "DSP",
+            "baseline_pct": 0.07,
+            "treatment_pct": 0.12
+          }
+        ]
+      },
+      "actions": [
+        {
+          "id": "c1",
+          "title": "floor 分层：高价值人群/时段提高，其他回落",
+          "owner": "SSP",
+          "validation": "离线模拟",
+          "evidence_fields": [
+            "supply_coverage.ssp.floor_ecpm",
+            "coverage_breakdown.by_hour.*.fill_rate"
+          ]
+        },
+        {
+          "id": "c2",
+          "title": "DSP 侧：提高竞价上限或补充保量 campaign",
+          "owner": "DSP",
+          "validation": "小流量验证",
+          "evidence_fields": [
+            "reasons.auction.BID_TOO_LOW",
+            "bidding_budget.dsp.bid_multiplier"
+          ]
+        },
+        {
+          "id": "c3",
+          "title": "ADX 侧：降低 timeout（并行请求/超时阈值/压缩请求）",
+          "owner": "ADX",
+          "validation": "小流量验证",
+          "evidence_fields": [
+            "adx_exchange.adx.timeout_rate",
+            "adx_exchange.adx.bid_response_rate"
+          ]
+        }
+      ]
+    }
+  ]
+}

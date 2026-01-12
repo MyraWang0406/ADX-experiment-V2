@@ -1,0 +1,2458 @@
+{
+  "experiment_id": "exp_003",
+  "title": "提高底价 + 保量节奏调整：收入↑但 fill 下降，定位拍卖卡点并修复",
+  "created_at": "2026-01-09T09:30:00",
+  "primary_segment": {
+    "id": "seg_new_25_34",
+    "name": "新用户·25-34",
+    "dims": {
+      "is_new": 1,
+      "age": "25-34",
+      "net": "normal"
+    }
+  },
+  "narrative": "为了提升 eCPM 与收入，提高 floor 并调整 pacing 以避免早花光预算。上线后收入上升但填充率下降、曝光不足导致 VV 不达标。通过拍卖监控与原因树定位 BID_TOO_LOW / TIMEOUT，回调 floor 与超时阈值并优化 pacing。",
+  "knobs": {
+    "high_floor": true,
+    "objective": "OCPX_CPA",
+    "floor": 1.35,
+    "target_cpa": 7.8,
+    "daily_budget": 12000
+  },
+  "pipeline": {
+    "funnel": {
+      "baseline": {
+        "pool": 1000000,
+        "after_recall": 17001,
+        "after_coarse": 305,
+        "after_fine": 28,
+        "final": 21
+      },
+      "treatment": {
+        "pool": 1000000,
+        "after_recall": 17001,
+        "after_coarse": 305,
+        "after_fine": 28,
+        "final": 21
+      }
+    },
+    "latency_ms": {
+      "baseline": {
+        "recall": 11,
+        "coarse": 10,
+        "fine": 28,
+        "rerank": 5,
+        "auction": 17,
+        "total": 71
+      },
+      "treatment": {
+        "recall": 8,
+        "coarse": 12,
+        "fine": 48,
+        "rerank": 3,
+        "auction": 23,
+        "total": 94
+      }
+    },
+    "category_dist": {
+      "baseline": {
+        "美妆穿搭": 0.05015696312414558,
+        "潮流数码": 0.1875762138629214,
+        "运动游戏": 0.03808535472634294,
+        "美食探店": 0.11078525259600344,
+        "情感两性": 0.05959837104802663,
+        "产品学习": 0.21479279477230923,
+        "职场成长": 0.13213830152410422,
+        "本地同城": 0.04922144718451287,
+        "搞笑娱乐": 0.07061671967873434,
+        "旅行户外": 0.08702858148289926
+      },
+      "treatment": {
+        "美妆穿搭": 0.050156963124145595,
+        "潮流数码": 0.18757621386292145,
+        "运动游戏": 0.038085354726342946,
+        "美食探店": 0.11078525259600347,
+        "情感两性": 0.05959837104802664,
+        "产品学习": 0.21479279477230928,
+        "职场成长": 0.13213830152410425,
+        "本地同城": 0.049221447184512886,
+        "搞笑娱乐": 0.07061671967873435,
+        "旅行户外": 0.08702858148289927
+      }
+    },
+    "reasons": {
+      "baseline": {
+        "rerank": {
+          "FILTERED_BY_DUP": 0.0847,
+          "FILTERED_BY_QUALITY": 0.1036,
+          "FILTERED_BY_FREQ_CAP": 0.0777,
+          "DIVERSITY_SWAP": 0.479,
+          "RESOURCE_SLOT_INSERT": 0.2549
+        },
+        "auction": {
+          "BUDGET_EXHAUSTED": 0.1299,
+          "BID_TOO_LOW": 0.3975,
+          "TIMEOUT": 0.4726
+        }
+      },
+      "treatment": {
+        "rerank": {
+          "FILTERED_BY_DUP": 0.446,
+          "FILTERED_BY_QUALITY": 0.0358,
+          "FILTERED_BY_FREQ_CAP": 0.1452,
+          "DIVERSITY_SWAP": 0.1657,
+          "RESOURCE_SLOT_INSERT": 0.2074
+        },
+        "auction": {
+          "BUDGET_EXHAUSTED": 0.5411,
+          "BID_TOO_LOW": 0.1157,
+          "TIMEOUT": 0.3432
+        }
+      }
+    },
+    "auction": {
+      "baseline": {
+        "objective": "OCPX_CPA",
+        "floor_ecpm": 1350.0,
+        "bid_ecpm_quantiles": {
+          "p10": 11.690392449917027,
+          "p50": 37.954963567087106,
+          "p90": 103.16627492017629
+        },
+        "clearing_ecpm_quantiles": {
+          "p10": 0.0,
+          "p50": 0.0,
+          "p90": 0.0
+        },
+        "win_rate": 0.0,
+        "timeout_rate": 0.0064
+      },
+      "treatment": {
+        "objective": "OCPX_CPA",
+        "floor_ecpm": 1417.5,
+        "bid_ecpm_quantiles": {
+          "p10": 11.422114483686492,
+          "p50": 37.13666634026881,
+          "p90": 99.11349570205341
+        },
+        "clearing_ecpm_quantiles": {
+          "p10": 0.0,
+          "p50": 0.0,
+          "p90": 0.0
+        },
+        "win_rate": 0.0,
+        "timeout_rate": 0.024
+      }
+    },
+    "ocpx_timeseries": {
+      "baseline": [
+        {
+          "hour": 0,
+          "traffic_q": 1237,
+          "spend": 341.74,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.653,
+          "multiplier": 0.9934,
+          "budget_left": 11658.26
+        },
+        {
+          "hour": 1,
+          "traffic_q": 1476,
+          "spend": 294.97,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.89,
+          "multiplier": 0.9974,
+          "budget_left": 11363.29
+        },
+        {
+          "hour": 2,
+          "traffic_q": 1396,
+          "spend": 338.48,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.009,
+          "multiplier": 0.9607,
+          "budget_left": 11024.81
+        },
+        {
+          "hour": 3,
+          "traffic_q": 1265,
+          "spend": 288.93,
+          "target_cpa": 7.8,
+          "actual_cpa": 8.335,
+          "multiplier": 0.9833,
+          "budget_left": 10735.87
+        },
+        {
+          "hour": 4,
+          "traffic_q": 953,
+          "spend": 260.51,
+          "target_cpa": 7.8,
+          "actual_cpa": 6.434,
+          "multiplier": 0.9192,
+          "budget_left": 10475.36
+        },
+        {
+          "hour": 5,
+          "traffic_q": 1673,
+          "spend": 313.26,
+          "target_cpa": 7.8,
+          "actual_cpa": 8.385,
+          "multiplier": 0.9428,
+          "budget_left": 10162.1
+        },
+        {
+          "hour": 6,
+          "traffic_q": 1169,
+          "spend": 413.95,
+          "target_cpa": 7.8,
+          "actual_cpa": 8.057,
+          "multiplier": 0.9535,
+          "budget_left": 9748.15
+        },
+        {
+          "hour": 7,
+          "traffic_q": 1236,
+          "spend": 356.1,
+          "target_cpa": 7.8,
+          "actual_cpa": 8.966,
+          "multiplier": 1.0011,
+          "budget_left": 9392.04
+        },
+        {
+          "hour": 8,
+          "traffic_q": 977,
+          "spend": 356.6,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.173,
+          "multiplier": 0.9722,
+          "budget_left": 9035.44
+        },
+        {
+          "hour": 9,
+          "traffic_q": 1215,
+          "spend": 400.3,
+          "target_cpa": 7.8,
+          "actual_cpa": 8.568,
+          "multiplier": 1.0047,
+          "budget_left": 8635.13
+        },
+        {
+          "hour": 10,
+          "traffic_q": 1344,
+          "spend": 430.46,
+          "target_cpa": 7.8,
+          "actual_cpa": 6.574,
+          "multiplier": 0.9463,
+          "budget_left": 8204.68
+        },
+        {
+          "hour": 11,
+          "traffic_q": 1953,
+          "spend": 837.67,
+          "target_cpa": 7.8,
+          "actual_cpa": 6.967,
+          "multiplier": 0.9097,
+          "budget_left": 7367.0
+        },
+        {
+          "hour": 12,
+          "traffic_q": 1501,
+          "spend": 725.79,
+          "target_cpa": 7.8,
+          "actual_cpa": 8.653,
+          "multiplier": 0.9433,
+          "budget_left": 6641.22
+        },
+        {
+          "hour": 13,
+          "traffic_q": 1526,
+          "spend": 728.19,
+          "target_cpa": 7.8,
+          "actual_cpa": 8.448,
+          "multiplier": 0.9701,
+          "budget_left": 5913.03
+        },
+        {
+          "hour": 14,
+          "traffic_q": 1287,
+          "spend": 423.62,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.443,
+          "multiplier": 0.9543,
+          "budget_left": 5489.41
+        },
+        {
+          "hour": 15,
+          "traffic_q": 1458,
+          "spend": 445.24,
+          "target_cpa": 7.8,
+          "actual_cpa": 8.662,
+          "multiplier": 0.9899,
+          "budget_left": 5044.17
+        },
+        {
+          "hour": 16,
+          "traffic_q": 1861,
+          "spend": 371.22,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.443,
+          "multiplier": 0.9738,
+          "budget_left": 4672.95
+        },
+        {
+          "hour": 17,
+          "traffic_q": 1133,
+          "spend": 419.54,
+          "target_cpa": 7.8,
+          "actual_cpa": 6.433,
+          "multiplier": 0.9103,
+          "budget_left": 4253.41
+        },
+        {
+          "hour": 18,
+          "traffic_q": 1177,
+          "spend": 761.69,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.903,
+          "multiplier": 0.9145,
+          "budget_left": 3491.72
+        },
+        {
+          "hour": 19,
+          "traffic_q": 1588,
+          "spend": 904.13,
+          "target_cpa": 7.8,
+          "actual_cpa": 8.195,
+          "multiplier": 0.9305,
+          "budget_left": 2587.59
+        },
+        {
+          "hour": 20,
+          "traffic_q": 1096,
+          "spend": 907.32,
+          "target_cpa": 7.8,
+          "actual_cpa": 6.123,
+          "multiplier": 0.8549,
+          "budget_left": 1680.27
+        },
+        {
+          "hour": 21,
+          "traffic_q": 1036,
+          "spend": 956.63,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.6,
+          "multiplier": 0.8472,
+          "budget_left": 723.64
+        },
+        {
+          "hour": 22,
+          "traffic_q": 2049,
+          "spend": 382.07,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.784,
+          "multiplier": 0.8466,
+          "budget_left": 341.56
+        },
+        {
+          "hour": 23,
+          "traffic_q": 1081,
+          "spend": 341.56,
+          "target_cpa": 7.8,
+          "actual_cpa": 5.93,
+          "multiplier": 0.7691,
+          "budget_left": 0.0
+        }
+      ],
+      "treatment": [
+        {
+          "hour": 0,
+          "traffic_q": 1478,
+          "spend": 306.86,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.966,
+          "multiplier": 1.0074,
+          "budget_left": 11693.14
+        },
+        {
+          "hour": 1,
+          "traffic_q": 1570,
+          "spend": 302.22,
+          "target_cpa": 7.8,
+          "actual_cpa": 6.751,
+          "multiplier": 0.9578,
+          "budget_left": 11390.92
+        },
+        {
+          "hour": 2,
+          "traffic_q": 1165,
+          "spend": 313.25,
+          "target_cpa": 7.8,
+          "actual_cpa": 6.259,
+          "multiplier": 0.8867,
+          "budget_left": 11077.67
+        },
+        {
+          "hour": 3,
+          "traffic_q": 1187,
+          "spend": 328.75,
+          "target_cpa": 7.8,
+          "actual_cpa": 8.701,
+          "multiplier": 0.9213,
+          "budget_left": 10748.93
+        },
+        {
+          "hour": 4,
+          "traffic_q": 2307,
+          "spend": 325.46,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.923,
+          "multiplier": 0.9264,
+          "budget_left": 10423.46
+        },
+        {
+          "hour": 5,
+          "traffic_q": 1187,
+          "spend": 276.19,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.075,
+          "multiplier": 0.8953,
+          "budget_left": 10147.27
+        },
+        {
+          "hour": 6,
+          "traffic_q": 943,
+          "spend": 385.16,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.306,
+          "multiplier": 0.875,
+          "budget_left": 9762.11
+        },
+        {
+          "hour": 7,
+          "traffic_q": 1420,
+          "spend": 439.18,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.782,
+          "multiplier": 0.8743,
+          "budget_left": 9322.92
+        },
+        {
+          "hour": 8,
+          "traffic_q": 1472,
+          "spend": 391.61,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.162,
+          "multiplier": 0.8486,
+          "budget_left": 8931.31
+        },
+        {
+          "hour": 9,
+          "traffic_q": 1406,
+          "spend": 422.34,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.065,
+          "multiplier": 0.8197,
+          "budget_left": 8508.97
+        },
+        {
+          "hour": 10,
+          "traffic_q": 1603,
+          "spend": 443.57,
+          "target_cpa": 7.8,
+          "actual_cpa": 6.829,
+          "multiplier": 0.7824,
+          "budget_left": 8065.4
+        },
+        {
+          "hour": 11,
+          "traffic_q": 1709,
+          "spend": 743.7,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.398,
+          "multiplier": 0.7681,
+          "budget_left": 7321.7
+        },
+        {
+          "hour": 12,
+          "traffic_q": 1059,
+          "spend": 702.83,
+          "target_cpa": 7.8,
+          "actual_cpa": 6.669,
+          "multiplier": 0.7271,
+          "budget_left": 6618.86
+        },
+        {
+          "hour": 13,
+          "traffic_q": 999,
+          "spend": 649.97,
+          "target_cpa": 7.8,
+          "actual_cpa": 5.841,
+          "multiplier": 0.6571,
+          "budget_left": 5968.89
+        },
+        {
+          "hour": 14,
+          "traffic_q": 1337,
+          "spend": 375.51,
+          "target_cpa": 7.8,
+          "actual_cpa": 6.641,
+          "multiplier": 0.6211,
+          "budget_left": 5593.38
+        },
+        {
+          "hour": 15,
+          "traffic_q": 791,
+          "spend": 446.41,
+          "target_cpa": 7.8,
+          "actual_cpa": 6.401,
+          "multiplier": 0.5796,
+          "budget_left": 5146.97
+        },
+        {
+          "hour": 16,
+          "traffic_q": 1310,
+          "spend": 421.98,
+          "target_cpa": 7.8,
+          "actual_cpa": 5.867,
+          "multiplier": 0.55,
+          "budget_left": 4724.99
+        },
+        {
+          "hour": 17,
+          "traffic_q": 1019,
+          "spend": 422.49,
+          "target_cpa": 7.8,
+          "actual_cpa": 6.754,
+          "multiplier": 0.55,
+          "budget_left": 4302.5
+        },
+        {
+          "hour": 18,
+          "traffic_q": 1778,
+          "spend": 915.19,
+          "target_cpa": 7.8,
+          "actual_cpa": 8.0,
+          "multiplier": 0.5549,
+          "budget_left": 3387.31
+        },
+        {
+          "hour": 19,
+          "traffic_q": 1030,
+          "spend": 853.91,
+          "target_cpa": 7.8,
+          "actual_cpa": 6.151,
+          "multiplier": 0.55,
+          "budget_left": 2533.39
+        },
+        {
+          "hour": 20,
+          "traffic_q": 1146,
+          "spend": 896.39,
+          "target_cpa": 7.8,
+          "actual_cpa": 6.826,
+          "multiplier": 0.55,
+          "budget_left": 1637.01
+        },
+        {
+          "hour": 21,
+          "traffic_q": 1510,
+          "spend": 890.49,
+          "target_cpa": 7.8,
+          "actual_cpa": 6.586,
+          "multiplier": 0.55,
+          "budget_left": 746.52
+        },
+        {
+          "hour": 22,
+          "traffic_q": 1561,
+          "spend": 455.73,
+          "target_cpa": 7.8,
+          "actual_cpa": 7.891,
+          "multiplier": 0.5522,
+          "budget_left": 290.79
+        },
+        {
+          "hour": 23,
+          "traffic_q": 1103,
+          "spend": 290.79,
+          "target_cpa": 7.8,
+          "actual_cpa": 6.745,
+          "multiplier": 0.55,
+          "budget_left": 0.0
+        }
+      ]
+    },
+    "topN_feed": {
+      "baseline": [
+        {
+          "rank": 1,
+          "content_id": 76652,
+          "category": "旅行户外",
+          "tags": [
+            "高端",
+            "新手入门",
+            "测评"
+          ],
+          "score": 0.6507,
+          "author_id": 20760,
+          "duration_s": 60
+        },
+        {
+          "rank": 2,
+          "content_id": 17577,
+          "category": "搞笑娱乐",
+          "tags": [
+            "高端",
+            "弱网友好",
+            "短平快"
+          ],
+          "score": 0.5957,
+          "author_id": 31774,
+          "duration_s": 12
+        },
+        {
+          "rank": 3,
+          "content_id": 43059,
+          "category": "产品学习",
+          "tags": [
+            "种草",
+            "本地优惠",
+            "测评"
+          ],
+          "score": 0.6557,
+          "author_id": 28220,
+          "duration_s": 20
+        },
+        {
+          "rank": 4,
+          "content_id": 26961,
+          "category": "美妆穿搭",
+          "tags": [
+            "复盘",
+            "生活方式",
+            "深度干货"
+          ],
+          "score": 0.5473,
+          "author_id": 45357,
+          "duration_s": 30
+        },
+        {
+          "rank": 5,
+          "content_id": 52905,
+          "category": "产品学习",
+          "tags": [
+            "开箱",
+            "强钩子"
+          ],
+          "score": 0.5668,
+          "author_id": 3233,
+          "duration_s": 45
+        },
+        {
+          "rank": 6,
+          "content_id": 160352,
+          "category": "搞笑娱乐",
+          "tags": [
+            "开箱",
+            "深度干货",
+            "新手入门"
+          ],
+          "score": 0.5292,
+          "author_id": 46914,
+          "duration_s": 20
+        },
+        {
+          "rank": 7,
+          "content_id": 72094,
+          "category": "产品学习",
+          "tags": [
+            "高端",
+            "生活方式"
+          ],
+          "score": 0.6944,
+          "author_id": 28050,
+          "duration_s": 45
+        },
+        {
+          "rank": 8,
+          "content_id": 204945,
+          "category": "美食探店",
+          "tags": [
+            "强钩子",
+            "深度干货",
+            "情绪价值"
+          ],
+          "score": 0.4836,
+          "author_id": 46959,
+          "duration_s": 12
+        },
+        {
+          "rank": 9,
+          "content_id": 199380,
+          "category": "潮流数码",
+          "tags": [
+            "长视频",
+            "开箱",
+            "性价比"
+          ],
+          "score": 0.7806,
+          "author_id": 36811,
+          "duration_s": 90
+        },
+        {
+          "rank": 10,
+          "content_id": 151518,
+          "category": "潮流数码",
+          "tags": [
+            "强钩子",
+            "深度干货",
+            "高端"
+          ],
+          "score": 0.7051,
+          "author_id": 30852,
+          "duration_s": 90
+        },
+        {
+          "rank": 11,
+          "content_id": 131908,
+          "category": "潮流数码",
+          "tags": [
+            "短平快",
+            "弱网友好"
+          ],
+          "score": 0.5984,
+          "author_id": 35446,
+          "duration_s": 90
+        },
+        {
+          "rank": 12,
+          "content_id": 141441,
+          "category": "美食探店",
+          "tags": [
+            "性价比",
+            "新手入门",
+            "深度干货"
+          ],
+          "score": 0.6637,
+          "author_id": 50240,
+          "duration_s": 20
+        },
+        {
+          "rank": 13,
+          "content_id": 204733,
+          "category": "职场成长",
+          "tags": [
+            "新手入门",
+            "长视频"
+          ],
+          "score": 0.7333,
+          "author_id": 26974,
+          "duration_s": 8
+        },
+        {
+          "rank": 14,
+          "content_id": 57256,
+          "category": "产品学习",
+          "tags": [
+            "深度干货",
+            "长视频",
+            "强钩子"
+          ],
+          "score": 0.6972,
+          "author_id": 23917,
+          "duration_s": 15
+        },
+        {
+          "rank": 15,
+          "content_id": 156152,
+          "category": "潮流数码",
+          "tags": [
+            "生活方式",
+            "性价比"
+          ],
+          "score": 0.6165,
+          "author_id": 37556,
+          "duration_s": 8
+        },
+        {
+          "rank": 16,
+          "content_id": 48962,
+          "category": "潮流数码",
+          "tags": [
+            "性价比",
+            "种草",
+            "高端"
+          ],
+          "score": 0.5639,
+          "author_id": 47445,
+          "duration_s": 12
+        },
+        {
+          "rank": 17,
+          "content_id": 24230,
+          "category": "潮流数码",
+          "tags": [
+            "生活方式",
+            "深度干货",
+            "情绪价值"
+          ],
+          "score": 0.7545,
+          "author_id": 43337,
+          "duration_s": 15
+        },
+        {
+          "rank": 18,
+          "content_id": 136663,
+          "category": "情感两性",
+          "tags": [
+            "短平快",
+            "教程",
+            "强钩子"
+          ],
+          "score": 0.4815,
+          "author_id": 2425,
+          "duration_s": 20
+        },
+        {
+          "rank": 19,
+          "content_id": 57974,
+          "category": "职场成长",
+          "tags": [
+            "教程",
+            "生活方式"
+          ],
+          "score": 0.7664,
+          "author_id": 19954,
+          "duration_s": 45
+        },
+        {
+          "rank": 20,
+          "content_id": 131216,
+          "category": "潮流数码",
+          "tags": [
+            "生活方式",
+            "开箱",
+            "本地优惠"
+          ],
+          "score": 0.5303,
+          "author_id": 37054,
+          "duration_s": 90
+        },
+        {
+          "rank": 21,
+          "content_id": 94916,
+          "category": "职场成长",
+          "tags": [
+            "深度干货",
+            "情绪价值",
+            "生活方式"
+          ],
+          "score": 0.5018,
+          "author_id": 25687,
+          "duration_s": 45
+        },
+        {
+          "rank": 22,
+          "content_id": 13450,
+          "category": "本地同城",
+          "tags": [
+            "性价比",
+            "教程",
+            "深度干货"
+          ],
+          "score": 0.6744,
+          "author_id": 45513,
+          "duration_s": 8
+        },
+        {
+          "rank": 23,
+          "content_id": 158694,
+          "category": "产品学习",
+          "tags": [
+            "新手入门",
+            "本地优惠",
+            "短平快"
+          ],
+          "score": 0.5779,
+          "author_id": 41783,
+          "duration_s": 15
+        },
+        {
+          "rank": 24,
+          "content_id": 114108,
+          "category": "旅行户外",
+          "tags": [
+            "短平快",
+            "新手入门",
+            "测评"
+          ],
+          "score": 0.5282,
+          "author_id": 40412,
+          "duration_s": 12
+        },
+        {
+          "rank": 25,
+          "content_id": 24997,
+          "category": "情感两性",
+          "tags": [
+            "生活方式",
+            "本地优惠",
+            "情绪价值"
+          ],
+          "score": 0.5727,
+          "author_id": 17353,
+          "duration_s": 15
+        },
+        {
+          "rank": 26,
+          "content_id": 34210,
+          "category": "潮流数码",
+          "tags": [
+            "复盘",
+            "开箱"
+          ],
+          "score": 0.6975,
+          "author_id": 33170,
+          "duration_s": 60
+        },
+        {
+          "rank": 27,
+          "content_id": 128699,
+          "category": "搞笑娱乐",
+          "tags": [
+            "高端",
+            "情绪价值"
+          ],
+          "score": 0.4974,
+          "author_id": 1093,
+          "duration_s": 15
+        },
+        {
+          "rank": 28,
+          "content_id": 65646,
+          "category": "职场成长",
+          "tags": [
+            "测评",
+            "新手入门",
+            "本地优惠"
+          ],
+          "score": 0.7114,
+          "author_id": 39287,
+          "duration_s": 12
+        },
+        {
+          "rank": 29,
+          "content_id": 103147,
+          "category": "美食探店",
+          "tags": [
+            "教程",
+            "开箱"
+          ],
+          "score": 0.6082,
+          "author_id": 28010,
+          "duration_s": 45
+        },
+        {
+          "rank": 30,
+          "content_id": 69871,
+          "category": "本地同城",
+          "tags": [
+            "短平快",
+            "深度干货"
+          ],
+          "score": 0.4422,
+          "author_id": 42032,
+          "duration_s": 30
+        },
+        {
+          "rank": 31,
+          "content_id": 147001,
+          "category": "职场成长",
+          "tags": [
+            "测评",
+            "情绪价值"
+          ],
+          "score": 0.4478,
+          "author_id": 34858,
+          "duration_s": 20
+        },
+        {
+          "rank": 32,
+          "content_id": 22202,
+          "category": "产品学习",
+          "tags": [
+            "开箱",
+            "情绪价值"
+          ],
+          "score": 0.6588,
+          "author_id": 21533,
+          "duration_s": 12
+        },
+        {
+          "rank": 33,
+          "content_id": 207370,
+          "category": "旅行户外",
+          "tags": [
+            "性价比",
+            "复盘",
+            "短平快"
+          ],
+          "score": 0.6472,
+          "author_id": 38557,
+          "duration_s": 15
+        },
+        {
+          "rank": 34,
+          "content_id": 144838,
+          "category": "产品学习",
+          "tags": [
+            "生活方式",
+            "测评",
+            "情绪价值"
+          ],
+          "score": 0.6042,
+          "author_id": 37806,
+          "duration_s": 20
+        },
+        {
+          "rank": 35,
+          "content_id": 162639,
+          "category": "产品学习",
+          "tags": [
+            "长视频",
+            "测评"
+          ],
+          "score": 0.695,
+          "author_id": 29256,
+          "duration_s": 45
+        },
+        {
+          "rank": 36,
+          "content_id": 105586,
+          "category": "搞笑娱乐",
+          "tags": [
+            "种草",
+            "开箱"
+          ],
+          "score": 0.5404,
+          "author_id": 43156,
+          "duration_s": 60
+        },
+        {
+          "rank": 37,
+          "content_id": 73780,
+          "category": "职场成长",
+          "tags": [
+            "本地优惠",
+            "强钩子",
+            "长视频"
+          ],
+          "score": 0.5398,
+          "author_id": 23934,
+          "duration_s": 20
+        },
+        {
+          "rank": 38,
+          "content_id": 82523,
+          "category": "产品学习",
+          "tags": [
+            "新手入门",
+            "开箱",
+            "弱网友好"
+          ],
+          "score": 0.7308,
+          "author_id": 6225,
+          "duration_s": 30
+        },
+        {
+          "rank": 39,
+          "content_id": 160337,
+          "category": "旅行户外",
+          "tags": [
+            "生活方式",
+            "短平快",
+            "种草"
+          ],
+          "score": 0.5749,
+          "author_id": 19392,
+          "duration_s": 60
+        },
+        {
+          "rank": 40,
+          "content_id": 196326,
+          "category": "搞笑娱乐",
+          "tags": [
+            "生活方式",
+            "教程",
+            "强钩子"
+          ],
+          "score": 0.6213,
+          "author_id": 47504,
+          "duration_s": 15
+        },
+        {
+          "rank": 41,
+          "content_id": 48412,
+          "category": "潮流数码",
+          "tags": [
+            "强钩子",
+            "生活方式",
+            "教程"
+          ],
+          "score": 0.5514,
+          "author_id": 6247,
+          "duration_s": 60
+        },
+        {
+          "rank": 42,
+          "content_id": 129908,
+          "category": "产品学习",
+          "tags": [
+            "情绪价值",
+            "高端"
+          ],
+          "score": 0.5665,
+          "author_id": 37526,
+          "duration_s": 45
+        },
+        {
+          "rank": 43,
+          "content_id": 103270,
+          "category": "产品学习",
+          "tags": [
+            "情绪价值",
+            "短平快",
+            "长视频"
+          ],
+          "score": 0.727,
+          "author_id": 42881,
+          "duration_s": 30
+        },
+        {
+          "rank": 44,
+          "content_id": 156382,
+          "category": "潮流数码",
+          "tags": [
+            "深度干货",
+            "教程",
+            "弱网友好"
+          ],
+          "score": 0.5739,
+          "author_id": 1863,
+          "duration_s": 60
+        },
+        {
+          "rank": 45,
+          "content_id": 174827,
+          "category": "职场成长",
+          "tags": [
+            "长视频",
+            "复盘",
+            "本地优惠"
+          ],
+          "score": 0.6612,
+          "author_id": 2146,
+          "duration_s": 45
+        },
+        {
+          "rank": 46,
+          "content_id": 64015,
+          "category": "潮流数码",
+          "tags": [
+            "生活方式",
+            "新手入门"
+          ],
+          "score": 0.764,
+          "author_id": 25206,
+          "duration_s": 15
+        },
+        {
+          "rank": 47,
+          "content_id": 120865,
+          "category": "美妆穿搭",
+          "tags": [
+            "本地优惠",
+            "短平快"
+          ],
+          "score": 0.7346,
+          "author_id": 32463,
+          "duration_s": 45
+        },
+        {
+          "rank": 48,
+          "content_id": 57488,
+          "category": "搞笑娱乐",
+          "tags": [
+            "强钩子",
+            "深度干货"
+          ],
+          "score": 0.4369,
+          "author_id": 17226,
+          "duration_s": 8
+        },
+        {
+          "rank": 49,
+          "content_id": 40039,
+          "category": "产品学习",
+          "tags": [
+            "新手入门",
+            "弱网友好",
+            "种草"
+          ],
+          "score": 0.5731,
+          "author_id": 46518,
+          "duration_s": 30
+        },
+        {
+          "rank": 50,
+          "content_id": 137414,
+          "category": "旅行户外",
+          "tags": [
+            "开箱",
+            "深度干货",
+            "情绪价值"
+          ],
+          "score": 0.564,
+          "author_id": 45240,
+          "duration_s": 15
+        },
+        {
+          "rank": 51,
+          "content_id": 104869,
+          "category": "美食探店",
+          "tags": [
+            "本地优惠",
+            "高端",
+            "弱网友好"
+          ],
+          "score": 0.566,
+          "author_id": 30928,
+          "duration_s": 60
+        },
+        {
+          "rank": 52,
+          "content_id": 206918,
+          "category": "潮流数码",
+          "tags": [
+            "种草",
+            "短平快",
+            "教程"
+          ],
+          "score": 0.6058,
+          "author_id": 32762,
+          "duration_s": 20
+        },
+        {
+          "rank": 53,
+          "content_id": 88657,
+          "category": "职场成长",
+          "tags": [
+            "本地优惠",
+            "生活方式",
+            "弱网友好"
+          ],
+          "score": 0.693,
+          "author_id": 24518,
+          "duration_s": 8
+        },
+        {
+          "rank": 54,
+          "content_id": 41483,
+          "category": "运动游戏",
+          "tags": [
+            "深度干货",
+            "高端",
+            "生活方式"
+          ],
+          "score": 0.4663,
+          "author_id": 3975,
+          "duration_s": 30
+        },
+        {
+          "rank": 55,
+          "content_id": 149401,
+          "category": "职场成长",
+          "tags": [
+            "高端",
+            "测评"
+          ],
+          "score": 0.4634,
+          "author_id": 20873,
+          "duration_s": 45
+        },
+        {
+          "rank": 56,
+          "content_id": 197489,
+          "category": "运动游戏",
+          "tags": [
+            "短平快",
+            "深度干货"
+          ],
+          "score": 0.4827,
+          "author_id": 45633,
+          "duration_s": 30
+        },
+        {
+          "rank": 57,
+          "content_id": 179609,
+          "category": "产品学习",
+          "tags": [
+            "强钩子",
+            "种草"
+          ],
+          "score": 0.7147,
+          "author_id": 31451,
+          "duration_s": 60
+        },
+        {
+          "rank": 58,
+          "content_id": 40538,
+          "category": "情感两性",
+          "tags": [
+            "新手入门",
+            "生活方式",
+            "教程"
+          ],
+          "score": 0.6868,
+          "author_id": 12711,
+          "duration_s": 8
+        },
+        {
+          "rank": 59,
+          "content_id": 66093,
+          "category": "美妆穿搭",
+          "tags": [
+            "高端",
+            "教程"
+          ],
+          "score": 0.5213,
+          "author_id": 8211,
+          "duration_s": 45
+        },
+        {
+          "rank": 60,
+          "content_id": 84890,
+          "category": "美食探店",
+          "tags": [
+            "短平快",
+            "种草",
+            "测评"
+          ],
+          "score": 0.5393,
+          "author_id": 15287,
+          "duration_s": 30
+        }
+      ],
+      "treatment": [
+        {
+          "rank": 1,
+          "content_id": 93443,
+          "category": "美食探店",
+          "tags": [
+            "教程",
+            "种草",
+            "强钩子"
+          ],
+          "score": 0.4285,
+          "author_id": 2984,
+          "duration_s": 20
+        },
+        {
+          "rank": 2,
+          "content_id": 82298,
+          "category": "搞笑娱乐",
+          "tags": [
+            "长视频",
+            "高端"
+          ],
+          "score": 0.5965,
+          "author_id": 1056,
+          "duration_s": 8
+        },
+        {
+          "rank": 3,
+          "content_id": 59763,
+          "category": "旅行户外",
+          "tags": [
+            "生活方式",
+            "强钩子"
+          ],
+          "score": 0.6224,
+          "author_id": 23850,
+          "duration_s": 12
+        },
+        {
+          "rank": 4,
+          "content_id": 141509,
+          "category": "潮流数码",
+          "tags": [
+            "情绪价值",
+            "生活方式"
+          ],
+          "score": 0.5837,
+          "author_id": 50163,
+          "duration_s": 60
+        },
+        {
+          "rank": 5,
+          "content_id": 171582,
+          "category": "美食探店",
+          "tags": [
+            "强钩子",
+            "开箱",
+            "本地优惠"
+          ],
+          "score": 0.5161,
+          "author_id": 27565,
+          "duration_s": 15
+        },
+        {
+          "rank": 6,
+          "content_id": 110991,
+          "category": "产品学习",
+          "tags": [
+            "强钩子",
+            "生活方式"
+          ],
+          "score": 0.6126,
+          "author_id": 47212,
+          "duration_s": 45
+        },
+        {
+          "rank": 7,
+          "content_id": 94008,
+          "category": "职场成长",
+          "tags": [
+            "教程",
+            "深度干货",
+            "情绪价值"
+          ],
+          "score": 0.6364,
+          "author_id": 2790,
+          "duration_s": 60
+        },
+        {
+          "rank": 8,
+          "content_id": 79020,
+          "category": "情感两性",
+          "tags": [
+            "高端",
+            "本地优惠",
+            "复盘"
+          ],
+          "score": 0.5993,
+          "author_id": 4175,
+          "duration_s": 30
+        },
+        {
+          "rank": 9,
+          "content_id": 155356,
+          "category": "职场成长",
+          "tags": [
+            "强钩子",
+            "短平快",
+            "开箱"
+          ],
+          "score": 0.4871,
+          "author_id": 49171,
+          "duration_s": 20
+        },
+        {
+          "rank": 10,
+          "content_id": 177949,
+          "category": "产品学习",
+          "tags": [
+            "长视频",
+            "短平快"
+          ],
+          "score": 0.6815,
+          "author_id": 20052,
+          "duration_s": 20
+        },
+        {
+          "rank": 11,
+          "content_id": 180171,
+          "category": "运动游戏",
+          "tags": [
+            "测评",
+            "生活方式",
+            "复盘"
+          ],
+          "score": 0.5215,
+          "author_id": 32655,
+          "duration_s": 60
+        },
+        {
+          "rank": 12,
+          "content_id": 83140,
+          "category": "旅行户外",
+          "tags": [
+            "高端",
+            "弱网友好",
+            "开箱"
+          ],
+          "score": 0.5069,
+          "author_id": 27219,
+          "duration_s": 20
+        },
+        {
+          "rank": 13,
+          "content_id": 168964,
+          "category": "旅行户外",
+          "tags": [
+            "长视频",
+            "开箱"
+          ],
+          "score": 0.4701,
+          "author_id": 33812,
+          "duration_s": 12
+        },
+        {
+          "rank": 14,
+          "content_id": 51477,
+          "category": "搞笑娱乐",
+          "tags": [
+            "深度干货",
+            "强钩子"
+          ],
+          "score": 0.5179,
+          "author_id": 39349,
+          "duration_s": 60
+        },
+        {
+          "rank": 15,
+          "content_id": 94155,
+          "category": "职场成长",
+          "tags": [
+            "高端",
+            "长视频",
+            "强钩子"
+          ],
+          "score": 0.3203,
+          "author_id": 47939,
+          "duration_s": 90
+        },
+        {
+          "rank": 16,
+          "content_id": 104576,
+          "category": "旅行户外",
+          "tags": [
+            "弱网友好",
+            "测评"
+          ],
+          "score": 0.576,
+          "author_id": 17212,
+          "duration_s": 30
+        },
+        {
+          "rank": 17,
+          "content_id": 93310,
+          "category": "运动游戏",
+          "tags": [
+            "性价比",
+            "本地优惠"
+          ],
+          "score": 0.5988,
+          "author_id": 31973,
+          "duration_s": 60
+        },
+        {
+          "rank": 18,
+          "content_id": 164946,
+          "category": "情感两性",
+          "tags": [
+            "测评",
+            "强钩子"
+          ],
+          "score": 0.2976,
+          "author_id": 14803,
+          "duration_s": 45
+        },
+        {
+          "rank": 19,
+          "content_id": 164594,
+          "category": "职场成长",
+          "tags": [
+            "高端",
+            "长视频"
+          ],
+          "score": 0.4792,
+          "author_id": 26707,
+          "duration_s": 15
+        },
+        {
+          "rank": 20,
+          "content_id": 192497,
+          "category": "美食探店",
+          "tags": [
+            "深度干货",
+            "高端",
+            "教程"
+          ],
+          "score": 0.741,
+          "author_id": 13198,
+          "duration_s": 15
+        },
+        {
+          "rank": 21,
+          "content_id": 92531,
+          "category": "搞笑娱乐",
+          "tags": [
+            "种草",
+            "强钩子"
+          ],
+          "score": 0.4947,
+          "author_id": 15945,
+          "duration_s": 90
+        },
+        {
+          "rank": 22,
+          "content_id": 56154,
+          "category": "产品学习",
+          "tags": [
+            "本地优惠",
+            "弱网友好",
+            "复盘"
+          ],
+          "score": 0.7135,
+          "author_id": 18458,
+          "duration_s": 20
+        },
+        {
+          "rank": 23,
+          "content_id": 201939,
+          "category": "旅行户外",
+          "tags": [
+            "复盘",
+            "种草"
+          ],
+          "score": 0.4359,
+          "author_id": 48866,
+          "duration_s": 12
+        },
+        {
+          "rank": 24,
+          "content_id": 152112,
+          "category": "情感两性",
+          "tags": [
+            "性价比",
+            "短平快",
+            "种草"
+          ],
+          "score": 0.5149,
+          "author_id": 14942,
+          "duration_s": 30
+        },
+        {
+          "rank": 25,
+          "content_id": 156921,
+          "category": "潮流数码",
+          "tags": [
+            "生活方式",
+            "长视频",
+            "开箱"
+          ],
+          "score": 0.6565,
+          "author_id": 16921,
+          "duration_s": 8
+        },
+        {
+          "rank": 26,
+          "content_id": 181846,
+          "category": "产品学习",
+          "tags": [
+            "测评",
+            "情绪价值",
+            "深度干货"
+          ],
+          "score": 0.6808,
+          "author_id": 15296,
+          "duration_s": 12
+        },
+        {
+          "rank": 27,
+          "content_id": 11993,
+          "category": "美食探店",
+          "tags": [
+            "情绪价值",
+            "短平快"
+          ],
+          "score": 0.5508,
+          "author_id": 42454,
+          "duration_s": 20
+        },
+        {
+          "rank": 28,
+          "content_id": 167362,
+          "category": "运动游戏",
+          "tags": [
+            "弱网友好",
+            "深度干货",
+            "长视频"
+          ],
+          "score": 0.4186,
+          "author_id": 46604,
+          "duration_s": 20
+        },
+        {
+          "rank": 29,
+          "content_id": 48228,
+          "category": "潮流数码",
+          "tags": [
+            "新手入门",
+            "开箱",
+            "性价比"
+          ],
+          "score": 0.6356,
+          "author_id": 16995,
+          "duration_s": 60
+        },
+        {
+          "rank": 30,
+          "content_id": 90794,
+          "category": "潮流数码",
+          "tags": [
+            "强钩子",
+            "教程"
+          ],
+          "score": 0.7092,
+          "author_id": 29450,
+          "duration_s": 60
+        },
+        {
+          "rank": 31,
+          "content_id": 70773,
+          "category": "搞笑娱乐",
+          "tags": [
+            "长视频",
+            "短平快",
+            "本地优惠"
+          ],
+          "score": 0.5597,
+          "author_id": 13818,
+          "duration_s": 15
+        },
+        {
+          "rank": 32,
+          "content_id": 92648,
+          "category": "搞笑娱乐",
+          "tags": [
+            "测评",
+            "本地优惠",
+            "生活方式"
+          ],
+          "score": 0.5108,
+          "author_id": 32538,
+          "duration_s": 8
+        },
+        {
+          "rank": 33,
+          "content_id": 90134,
+          "category": "美妆穿搭",
+          "tags": [
+            "新手入门",
+            "高端",
+            "性价比"
+          ],
+          "score": 0.3285,
+          "author_id": 42821,
+          "duration_s": 90
+        },
+        {
+          "rank": 34,
+          "content_id": 69892,
+          "category": "职场成长",
+          "tags": [
+            "情绪价值",
+            "本地优惠",
+            "深度干货"
+          ],
+          "score": 0.624,
+          "author_id": 34321,
+          "duration_s": 45
+        },
+        {
+          "rank": 35,
+          "content_id": 75164,
+          "category": "职场成长",
+          "tags": [
+            "高端",
+            "本地优惠",
+            "复盘"
+          ],
+          "score": 0.7277,
+          "author_id": 38782,
+          "duration_s": 60
+        },
+        {
+          "rank": 36,
+          "content_id": 91324,
+          "category": "职场成长",
+          "tags": [
+            "开箱",
+            "新手入门"
+          ],
+          "score": 0.6549,
+          "author_id": 16734,
+          "duration_s": 20
+        },
+        {
+          "rank": 37,
+          "content_id": 149871,
+          "category": "搞笑娱乐",
+          "tags": [
+            "高端",
+            "情绪价值"
+          ],
+          "score": 0.4376,
+          "author_id": 4904,
+          "duration_s": 12
+        },
+        {
+          "rank": 38,
+          "content_id": 69229,
+          "category": "旅行户外",
+          "tags": [
+            "测评",
+            "生活方式"
+          ],
+          "score": 0.5913,
+          "author_id": 30768,
+          "duration_s": 60
+        },
+        {
+          "rank": 39,
+          "content_id": 198857,
+          "category": "旅行户外",
+          "tags": [
+            "长视频",
+            "情绪价值"
+          ],
+          "score": 0.6995,
+          "author_id": 50968,
+          "duration_s": 15
+        },
+        {
+          "rank": 40,
+          "content_id": 72554,
+          "category": "产品学习",
+          "tags": [
+            "短平快",
+            "高端",
+            "弱网友好"
+          ],
+          "score": 0.6267,
+          "author_id": 5280,
+          "duration_s": 30
+        },
+        {
+          "rank": 41,
+          "content_id": 86325,
+          "category": "潮流数码",
+          "tags": [
+            "短平快",
+            "本地优惠"
+          ],
+          "score": 0.6186,
+          "author_id": 20018,
+          "duration_s": 45
+        },
+        {
+          "rank": 42,
+          "content_id": 91044,
+          "category": "本地同城",
+          "tags": [
+            "生活方式",
+            "高端"
+          ],
+          "score": 0.5843,
+          "author_id": 45206,
+          "duration_s": 20
+        },
+        {
+          "rank": 43,
+          "content_id": 22254,
+          "category": "旅行户外",
+          "tags": [
+            "性价比",
+            "新手入门",
+            "弱网友好"
+          ],
+          "score": 0.6911,
+          "author_id": 31112,
+          "duration_s": 12
+        },
+        {
+          "rank": 44,
+          "content_id": 204201,
+          "category": "旅行户外",
+          "tags": [
+            "复盘",
+            "情绪价值",
+            "强钩子"
+          ],
+          "score": 0.653,
+          "author_id": 44717,
+          "duration_s": 15
+        },
+        {
+          "rank": 45,
+          "content_id": 178485,
+          "category": "职场成长",
+          "tags": [
+            "弱网友好",
+            "深度干货"
+          ],
+          "score": 0.5965,
+          "author_id": 5916,
+          "duration_s": 45
+        },
+        {
+          "rank": 46,
+          "content_id": 81268,
+          "category": "潮流数码",
+          "tags": [
+            "弱网友好",
+            "新手入门",
+            "复盘"
+          ],
+          "score": 0.6078,
+          "author_id": 33721,
+          "duration_s": 60
+        },
+        {
+          "rank": 47,
+          "content_id": 81184,
+          "category": "产品学习",
+          "tags": [
+            "复盘",
+            "深度干货",
+            "短平快"
+          ],
+          "score": 0.5267,
+          "author_id": 41140,
+          "duration_s": 90
+        },
+        {
+          "rank": 48,
+          "content_id": 27194,
+          "category": "本地同城",
+          "tags": [
+            "种草",
+            "本地优惠",
+            "测评"
+          ],
+          "score": 0.5165,
+          "author_id": 1623,
+          "duration_s": 90
+        },
+        {
+          "rank": 49,
+          "content_id": 99605,
+          "category": "情感两性",
+          "tags": [
+            "深度干货",
+            "长视频"
+          ],
+          "score": 0.5084,
+          "author_id": 4289,
+          "duration_s": 15
+        },
+        {
+          "rank": 50,
+          "content_id": 50095,
+          "category": "运动游戏",
+          "tags": [
+            "情绪价值",
+            "种草",
+            "长视频"
+          ],
+          "score": 0.5013,
+          "author_id": 13201,
+          "duration_s": 20
+        },
+        {
+          "rank": 51,
+          "content_id": 151862,
+          "category": "搞笑娱乐",
+          "tags": [
+            "种草",
+            "短平快"
+          ],
+          "score": 0.5713,
+          "author_id": 37291,
+          "duration_s": 15
+        },
+        {
+          "rank": 52,
+          "content_id": 141912,
+          "category": "潮流数码",
+          "tags": [
+            "复盘",
+            "短平快"
+          ],
+          "score": 0.5629,
+          "author_id": 42916,
+          "duration_s": 12
+        },
+        {
+          "rank": 53,
+          "content_id": 173816,
+          "category": "旅行户外",
+          "tags": [
+            "本地优惠",
+            "长视频"
+          ],
+          "score": 0.4428,
+          "author_id": 50781,
+          "duration_s": 60
+        },
+        {
+          "rank": 54,
+          "content_id": 88962,
+          "category": "旅行户外",
+          "tags": [
+            "新手入门",
+            "开箱"
+          ],
+          "score": 0.5753,
+          "author_id": 29077,
+          "duration_s": 60
+        },
+        {
+          "rank": 55,
+          "content_id": 113720,
+          "category": "产品学习",
+          "tags": [
+            "开箱",
+            "性价比"
+          ],
+          "score": 0.6681,
+          "author_id": 3607,
+          "duration_s": 8
+        },
+        {
+          "rank": 56,
+          "content_id": 198176,
+          "category": "潮流数码",
+          "tags": [
+            "教程",
+            "深度干货",
+            "本地优惠"
+          ],
+          "score": 0.5964,
+          "author_id": 35448,
+          "duration_s": 20
+        },
+        {
+          "rank": 57,
+          "content_id": 115072,
+          "category": "产品学习",
+          "tags": [
+            "开箱",
+            "新手入门"
+          ],
+          "score": 0.6046,
+          "author_id": 43942,
+          "duration_s": 45
+        },
+        {
+          "rank": 58,
+          "content_id": 191907,
+          "category": "旅行户外",
+          "tags": [
+            "情绪价值",
+            "高端",
+            "教程"
+          ],
+          "score": 0.4537,
+          "author_id": 23159,
+          "duration_s": 12
+        },
+        {
+          "rank": 59,
+          "content_id": 74284,
+          "category": "本地同城",
+          "tags": [
+            "教程",
+            "开箱"
+          ],
+          "score": 0.605,
+          "author_id": 4493,
+          "duration_s": 20
+        },
+        {
+          "rank": 60,
+          "content_id": 116596,
+          "category": "潮流数码",
+          "tags": [
+            "开箱",
+            "弱网友好"
+          ],
+          "score": 0.675,
+          "author_id": 12137,
+          "duration_s": 15
+        }
+      ]
+    },
+    "bottlenecks": [
+      {
+        "node": "auction",
+        "type": "fill_drop",
+        "note": "floor 提升导致 BID_TOO_LOW 增加，fill rate 下滑"
+      }
+    ]
+  },
+  "metrics_summary": {
+    "baseline": {
+      "north_star": {
+        "ad_vv": 212725,
+        "revenue": 81313.25
+      },
+      "guardrails": {
+        "d1_retention": 0.1471,
+        "early_exit_rate": 0.1365,
+        "complaint_rate": 0.00964
+      },
+      "leading": {
+        "ctr": 0.00824,
+        "cvr": 0.05,
+        "completion_rate": 0.1002,
+        "skip_short_rate": 0.3151,
+        "load_fail_rate": 0.0077
+      }
+    },
+    "treatment": {
+      "north_star": {
+        "ad_vv": 232863,
+        "revenue": 89029.63
+      },
+      "guardrails": {
+        "d1_retention": 0.1645,
+        "early_exit_rate": 0.0748,
+        "complaint_rate": 0.00077
+      },
+      "leading": {
+        "ctr": 0.02135,
+        "cvr": 0.00327,
+        "completion_rate": 0.3026,
+        "skip_short_rate": 0.3266,
+        "load_fail_rate": 0.1148
+      }
+    }
+  },
+  "breakdown": {
+    "by_segment": {
+      "seg_new_25_34": {
+        "baseline": {
+          "north_star": {
+            "ad_vv": 212725,
+            "revenue": 81313.25
+          },
+          "guardrails": {
+            "d1_retention": 0.1471,
+            "early_exit_rate": 0.1365,
+            "complaint_rate": 0.00964
+          },
+          "leading": {
+            "ctr": 0.00824,
+            "cvr": 0.05,
+            "completion_rate": 0.1002,
+            "skip_short_rate": 0.3151,
+            "load_fail_rate": 0.0077
+          }
+        },
+        "treatment": {
+          "north_star": {
+            "ad_vv": 232863,
+            "revenue": 89029.63
+          },
+          "guardrails": {
+            "d1_retention": 0.1645,
+            "early_exit_rate": 0.0748,
+            "complaint_rate": 0.00077
+          },
+          "leading": {
+            "ctr": 0.02135,
+            "cvr": 0.00327,
+            "completion_rate": 0.3026,
+            "skip_short_rate": 0.3266,
+            "load_fail_rate": 0.1148
+          }
+        }
+      },
+      "seg_old_strong_intent": {
+        "baseline": {
+          "north_star": {
+            "ad_vv": 210331,
+            "revenue": 92608.57
+          },
+          "guardrails": {
+            "d1_retention": 0.1947,
+            "early_exit_rate": 0.0137,
+            "complaint_rate": 0.00337
+          },
+          "leading": {
+            "ctr": 0.03823,
+            "cvr": 0.00464,
+            "completion_rate": 0.3521,
+            "skip_short_rate": 0.2283,
+            "load_fail_rate": 0.0078
+          }
+        },
+        "treatment": {
+          "north_star": {
+            "ad_vv": 165910,
+            "revenue": 74453.29
+          },
+          "guardrails": {
+            "d1_retention": 0.1976,
+            "early_exit_rate": 0.01,
+            "complaint_rate": 0.00065
+          },
+          "leading": {
+            "ctr": 0.08285,
+            "cvr": 0.01019,
+            "completion_rate": 0.279,
+            "skip_short_rate": 0.1738,
+            "load_fail_rate": 0.0132
+          }
+        }
+      },
+      "seg_local_lunch": {
+        "baseline": {
+          "north_star": {
+            "ad_vv": 269550,
+            "revenue": 85554.8
+          },
+          "guardrails": {
+            "d1_retention": 0.2526,
+            "early_exit_rate": 0.1536,
+            "complaint_rate": 0.00491
+          },
+          "leading": {
+            "ctr": 0.01152,
+            "cvr": 0.00523,
+            "completion_rate": 0.1267,
+            "skip_short_rate": 0.3795,
+            "load_fail_rate": 0.0326
+          }
+        },
+        "treatment": {
+          "north_star": {
+            "ad_vv": 224074,
+            "revenue": 77872.53
+          },
+          "guardrails": {
+            "d1_retention": 0.1735,
+            "early_exit_rate": 0.0289,
+            "complaint_rate": 0.00233
+          },
+          "leading": {
+            "ctr": 0.02933,
+            "cvr": 0.00681,
+            "completion_rate": 0.1614,
+            "skip_short_rate": 0.2815,
+            "load_fail_rate": 0.034
+          }
+        }
+      }
+    },
+    "by_recall_source": {
+      "kw_main": {
+        "share_baseline": 0.2503,
+        "share_treatment": 0.1525
+      },
+      "vec_sim": {
+        "share_baseline": 0.213,
+        "share_treatment": 0.2175
+      },
+      "cf_useritem": {
+        "share_baseline": 0.2127,
+        "share_treatment": 0.192
+      },
+      "hot_trend": {
+        "share_baseline": 0.1351,
+        "share_treatment": 0.1523
+      },
+      "young_boost": {
+        "share_baseline": 0.0,
+        "share_treatment": 0.0
+      }
+    },
+    "by_hour": {
+      "00": {
+        "requests": 10082,
+        "fill_rate": 0.9097,
+        "eCPM": 778.28
+      },
+      "01": {
+        "requests": 11987,
+        "fill_rate": 0.8138,
+        "eCPM": 546.31
+      },
+      "02": {
+        "requests": 12165,
+        "fill_rate": 0.8378,
+        "eCPM": 820.79
+      },
+      "03": {
+        "requests": 10378,
+        "fill_rate": 0.865,
+        "eCPM": 582.83
+      },
+      "04": {
+        "requests": 16175,
+        "fill_rate": 0.8233,
+        "eCPM": 767.31
+      },
+      "05": {
+        "requests": 9133,
+        "fill_rate": 0.8235,
+        "eCPM": 847.01
+      },
+      "06": {
+        "requests": 13894,
+        "fill_rate": 0.8288,
+        "eCPM": 612.39
+      },
+      "07": {
+        "requests": 16100,
+        "fill_rate": 0.8896,
+        "eCPM": 574.13
+      },
+      "08": {
+        "requests": 9969,
+        "fill_rate": 0.9198,
+        "eCPM": 641.92
+      },
+      "09": {
+        "requests": 11983,
+        "fill_rate": 0.7536,
+        "eCPM": 772.4
+      },
+      "10": {
+        "requests": 16403,
+        "fill_rate": 0.8258,
+        "eCPM": 848.67
+      },
+      "11": {
+        "requests": 8452,
+        "fill_rate": 0.8318,
+        "eCPM": 701.08
+      },
+      "12": {
+        "requests": 11830,
+        "fill_rate": 0.8893,
+        "eCPM": 546.18
+      },
+      "13": {
+        "requests": 10647,
+        "fill_rate": 0.8376,
+        "eCPM": 554.41
+      },
+      "14": {
+        "requests": 13953,
+        "fill_rate": 0.8691,
+        "eCPM": 520.09
+      },
+      "15": {
+        "requests": 10186,
+        "fill_rate": 0.8751,
+        "eCPM": 563.38
+      },
+      "16": {
+        "requests": 9386,
+        "fill_rate": 0.8505,
+        "eCPM": 573.71
+      },
+      "17": {
+        "requests": 11678,
+        "fill_rate": 0.869,
+        "eCPM": 481.44
+      },
+      "18": {
+        "requests": 12175,
+        "fill_rate": 0.8107,
+        "eCPM": 576.33
+      },
+      "19": {
+        "requests": 10300,
+        "fill_rate": 0.8914,
+        "eCPM": 741.11
+      },
+      "20": {
+        "requests": 11093,
+        "fill_rate": 0.9052,
+        "eCPM": 745.29
+      },
+      "21": {
+        "requests": 14984,
+        "fill_rate": 0.9146,
+        "eCPM": 801.91
+      },
+      "22": {
+        "requests": 14065,
+        "fill_rate": 0.837,
+        "eCPM": 572.86
+      },
+      "23": {
+        "requests": 11672,
+        "fill_rate": 0.8594,
+        "eCPM": 687.12
+      }
+    }
+  },
+  "diagnosis_tree": {
+    "root": "北极星未达预期 / 波动",
+    "branches": [
+      {
+        "node": "量不足（fill/coverage）",
+        "checks": [
+          "BID_TOO_LOW",
+          "BUDGET_EXHAUSTED",
+          "TIMEOUT"
+        ],
+        "evidence_fields": [
+          "pipeline.reasons.*.auction",
+          "breakdown.by_hour.*.fill_rate"
+        ]
+      },
+      {
+        "node": "质量/相关性不足（误杀/噪声）",
+        "checks": [
+          "FILTERED_BY_QUALITY",
+          "after_fine 缩小",
+          "CTR 下滑"
+        ],
+        "evidence_fields": [
+          "pipeline.funnel",
+          "pipeline.reasons.*.rerank",
+          "metrics_summary.*.leading.ctr"
+        ]
+      },
+      {
+        "node": "体验护栏受损",
+        "checks": [
+          "early_exit_rate",
+          "complaint_rate",
+          "load_fail_rate"
+        ],
+        "evidence_fields": [
+          "metrics_summary.*.guardrails",
+          "metrics_summary.*.leading.load_fail_rate"
+        ]
+      },
+      {
+        "node": "OCPX 控制不稳",
+        "checks": [
+          "multiplier 震荡",
+          "actual_cpa 偏离"
+        ],
+        "evidence_fields": [
+          "pipeline.ocpx_timeseries"
+        ]
+      }
+    ]
+  }
+}

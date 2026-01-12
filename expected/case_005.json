@@ -1,0 +1,39 @@
+{
+  "conclusion": "实验未达到预期，有效播放下降8.3%，CTR 下降20%，质量过滤过严导致候选数量不足。虽然相关性可能提升，但数量损失过大，需要放宽质量阈值以平衡质量和数量。",
+  "evidence_paths": [
+    "kpi_framework.north_star.baseline_value",
+    "kpi_framework.north_star.treatment_value",
+    "kpi_framework.guardrails[0].treatment_value",
+    "kpi_framework.guardrails[0].baseline_value",
+    "pipeline.funnel.baseline.after_fine",
+    "pipeline.funnel.treatment.after_fine",
+    "pipeline.reasons.treatment.rerank.FILTERED_BY_QUALITY",
+    "pipeline.reasons.baseline.rerank.FILTERED_BY_QUALITY",
+    "pipeline.bottlenecks[0].stage",
+    "pipeline.bottlenecks[0].symptom"
+  ],
+  "recommended_actions": [
+    {
+      "action": "放宽质量阈值",
+      "owner": "算法",
+      "validation": "观察 after_fine 数量和 CTR 变化",
+      "risk": "中",
+      "monitoring": "after_fine、CTR、FILTERED_BY_QUALITY 占比"
+    },
+    {
+      "action": "优化过滤策略",
+      "owner": "算法",
+      "validation": "监控质量过滤率和相关性指标",
+      "risk": "中",
+      "monitoring": "FILTERED_BY_QUALITY、相关性得分"
+    },
+    {
+      "action": "监控相关性指标",
+      "owner": "运营",
+      "validation": "每日查看相关性得分和用户反馈",
+      "risk": "低",
+      "monitoring": "相关性得分、用户投诉率"
+    }
+  ]
+}
+

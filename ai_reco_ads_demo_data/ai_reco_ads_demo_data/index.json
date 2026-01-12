@@ -1,0 +1,160 @@
+{
+  "dataset_version": "0.2-demo",
+  "created_at": "2026-01-09T09:30:00",
+  "experiments": [
+    {
+      "experiment_id": "exp_001",
+      "title": "新增年轻内容召回，修复新用户画风偏老"
+    },
+    {
+      "experiment_id": "exp_002",
+      "title": "弱网场景目标重定义：时长 → 完播正目标 + 短播跳过负目标"
+    },
+    {
+      "experiment_id": "exp_003",
+      "title": "提高底价 + 保量节奏调整：收入↑但 fill 下降，定位拍卖卡点并修复"
+    }
+  ],
+  "dictionaries": {
+    "categories": [
+      "美妆穿搭",
+      "潮流数码",
+      "运动游戏",
+      "美食探店",
+      "情感两性",
+      "产品学习",
+      "职场成长",
+      "本地同城",
+      "搞笑娱乐",
+      "旅行户外"
+    ],
+    "tags": [
+      "新手入门",
+      "深度干货",
+      "种草",
+      "测评",
+      "开箱",
+      "教程",
+      "复盘",
+      "情绪价值",
+      "性价比",
+      "高端",
+      "本地优惠",
+      "弱网友好",
+      "长视频",
+      "短平快",
+      "强钩子",
+      "生活方式"
+    ],
+    "recall_sources": [
+      {
+        "id": "kw_main",
+        "name": "关键词召回",
+        "type": "keyword"
+      },
+      {
+        "id": "vec_sim",
+        "name": "向量相似召回",
+        "type": "vector"
+      },
+      {
+        "id": "cf_useritem",
+        "name": "协同过滤召回",
+        "type": "cf"
+      },
+      {
+        "id": "hot_trend",
+        "name": "热榜召回",
+        "type": "pop"
+      },
+      {
+        "id": "follow_social",
+        "name": "关注/社交召回",
+        "type": "social"
+      },
+      {
+        "id": "young_boost",
+        "name": "年轻内容专项召回",
+        "type": "vector"
+      },
+      {
+        "id": "local_nearby",
+        "name": "同城附近召回",
+        "type": "geo"
+      }
+    ],
+    "segments": [
+      {
+        "id": "seg_new_18_24_weaknet",
+        "name": "新用户·18-24·弱网",
+        "dims": {
+          "is_new": 1,
+          "age": "18-24",
+          "net": "weak"
+        }
+      },
+      {
+        "id": "seg_new_25_34",
+        "name": "新用户·25-34",
+        "dims": {
+          "is_new": 1,
+          "age": "25-34",
+          "net": "normal"
+        }
+      },
+      {
+        "id": "seg_old_strong_intent",
+        "name": "老用户·强兴趣",
+        "dims": {
+          "is_new": 0,
+          "intent": "strong",
+          "net": "normal"
+        }
+      },
+      {
+        "id": "seg_local_lunch",
+        "name": "同城·午餐时段",
+        "dims": {
+          "is_new": 0,
+          "intent": "local",
+          "time": "12:00-14:00",
+          "net": "normal"
+        }
+      }
+    ],
+    "reason_codes": [
+      {
+        "code": "FILTERED_BY_DUP",
+        "name": "去重过滤"
+      },
+      {
+        "code": "FILTERED_BY_QUALITY",
+        "name": "质量门槛过滤"
+      },
+      {
+        "code": "FILTERED_BY_FREQ_CAP",
+        "name": "频控过滤"
+      },
+      {
+        "code": "DIVERSITY_SWAP",
+        "name": "多样性换位"
+      },
+      {
+        "code": "RESOURCE_SLOT_INSERT",
+        "name": "资源位插入"
+      },
+      {
+        "code": "BUDGET_EXHAUSTED",
+        "name": "预算耗尽"
+      },
+      {
+        "code": "BID_TOO_LOW",
+        "name": "出价不足/低于floor"
+      },
+      {
+        "code": "TIMEOUT",
+        "name": "超时未返回"
+      }
+    ]
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "experiment_id": "exp_003",
+  "title": "提高底价 + 保量节奏调整：收入↑但 fill↓，定位拍卖卡点并修复",
+  "narrative": "提高底价策略以提升收入，但导致填充率下降，通过拍卖监控定位卡点并优化。",
+  "primary_segment": {
+    "id": "all",
+    "name": "全量用户",
+    "dims": {}
+  },
+  "kpi_framework": {
+    "north_star": {
+      "name": "收入",
+      "unit": "元",
+      "baseline_value": 100000,
+      "treatment_value": 115000
+    },
+    "guardrails": [
+      {
+        "name": "填充率",
+        "unit": "%",
+        "baseline_value": 0.85,
+        "treatment_value": 0.72
+      },
+      {
+        "name": "超时率",
+        "unit": "%",
+        "baseline_value": 0.05,
+        "treatment_value": 0.12
+      }
+    ]
+  },
+  "pipeline": {
+    "bottlenecks": [
+      {
+        "stage": "auction",
+        "type": "Coverage",
+        "symptom": "底价过高导致填充率下降",
+        "impact": "收入提升但曝光不足",
+        "suggested_actions": [
+          "回调底价策略",
+          "优化超时阈值",
+          "调整预算节奏"
+        ]
+      }
+    ],
+    "funnel": {
+      "baseline": {
+        "pool": 1000000,
+        "after_recall": 600000,
+        "after_coarse": 300000,
+        "after_fine": 200000,
+        "final": 170000
+      },
+      "treatment": {
+        "pool": 1000000,
+        "after_recall": 600000,
+        "after_coarse": 300000,
+        "after_fine": 200000,
+        "final": 144000
+      }
+    },
+    "auction": {
+      "baseline": {
+        "win_rate": 0.85,
+        "timeout_rate": 0.05,
+        "floor_ecpm": 1000
+      },
+      "treatment": {
+        "win_rate": 0.72,
+        "timeout_rate": 0.12,
+        "floor_ecpm": 1200
+      }
+    },
+    "reasons": {
+      "baseline": {
+        "auction": {
+          "BID_TOO_LOW": 0.10,
+          "TIMEOUT": 0.05
+        }
+      },
+      "treatment": {
+        "auction": {
+          "BID_TOO_LOW": 0.15,
+          "TIMEOUT": 0.12
+        }
+      }
+    }
+  },
+  "diagnosis_tree": {
+    "root": "填充率下降",
+    "branches": [
+      {
+        "name": "拍卖卡点",
+        "evidence_fields": [
+          "pipeline.auction.win_rate",
+          "pipeline.auction.timeout_rate",
+          "pipeline.reasons.treatment.auction.BID_TOO_LOW"
+        ],
+        "actions": [
+          "回调底价策略",
+          "优化超时阈值"
+        ]
+      }
+    ]
+  }
+}
+
+
+

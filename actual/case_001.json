@@ -1,0 +1,34 @@
+{
+  "conclusion": "实验达到预期目标，有效播放提升10%，新用户年轻内容召回效果显著，画风分布优化，学习类内容占比提升5个百分点，娱乐类内容占比提升5个百分点。次日留存提升3个百分点，早退率下降1个百分点，护栏指标表现良好。",
+  "evidence_paths": [
+    "kpi_framework.north_star.baseline_value",
+    "kpi_framework.north_star.treatment_value",
+    "pipeline.funnel.baseline.after_recall",
+    "pipeline.funnel.treatment.after_recall",
+    "pipeline.category_dist.treatment.学习",
+    "pipeline.category_dist.baseline.学习",
+    "pipeline.bottlenecks[0].stage",
+    "pipeline.bottlenecks[0].symptom"
+  ],
+  "recommended_actions": [
+    {
+      "action": "增加年轻化内容召回源",
+      "owner": "算法",
+      "validation": "监控新用户留存和画风分布",
+      "risk": "低"
+    },
+    {
+      "action": "调整召回权重",
+      "owner": "算法",
+      "validation": "观察 after_recall 数量变化",
+      "risk": "中"
+    },
+    {
+      "action": "监控新用户留存",
+      "owner": "运营",
+      "validation": "每日查看次日留存指标",
+      "risk": "低"
+    }
+  ]
+}
+
