@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { nodeNames } from '@/lib/translations'
 import ExperimentSummaryCard from '@/components/ExperimentSummaryCard'
 import DebugPanel from '@/components/DebugPanel'
@@ -182,10 +183,12 @@ export default async function Home() {
       </footer>
 
       {/* Debug Panel */}
-      <DebugPanel
-        experimentsCount={total}
-        dataSource="/_mock/index.json"
-      />
+      <Suspense fallback={null}>
+        <DebugPanel
+          experimentsCount={total}
+          dataSource="/_mock/index.json"
+        />
+      </Suspense>
     </div>
   )
 }

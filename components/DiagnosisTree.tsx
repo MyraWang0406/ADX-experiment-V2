@@ -14,7 +14,21 @@ type DiagnosisBranch = {
 }
 
 interface DiagnosisTreeProps {
-  diagnosis: DiagnosisBranch | null | undefined
+  data?: {
+    root?: string
+    branches?: Array<{
+      name?: string
+      node?: string
+      title?: string
+      checks?: any[]
+      evidence_fields?: string[]
+      evidence?: any[]
+      children?: DiagnosisBranch[]
+      [key: string]: any
+    }>
+  } | null
+  diagnosis?: DiagnosisBranch | null | undefined
+  narrative?: string
 }
 
 function formatCheckText(raw: string): { zh: string; code?: string } {
@@ -82,11 +96,33 @@ function flattenBranches(root: DiagnosisBranch | null | undefined): DiagnosisBra
   return out
 }
 
-export default function DiagnosisTree({ diagnosis }: DiagnosisTreeProps) {
+export default function DiagnosisTree({ data, diagnosis, narrative }: DiagnosisTreeProps) {
   const [activeCategory, setActiveCategory] = useState<string>('量不足')
 
+  // 【修复】兼容两种数据格式：data (diagnosis_tree) 或 diagnosis (DiagnosisBranch)
+  const diagnosisNode: DiagnosisBranch | null | undefined = useMemo(() => {
+    if (diagnosis) return diagnosis
+    if (data?.branches && Array.isArray(data.branches) && data.branches.length > 0) {
+      // 将 diagnosis_tree 格式转换为 DiagnosisBranch 格式
+      // 创建一个虚拟根节点，将所有 branches 作为 children
+      return {
+        name: data.root || '诊断根节点',
+        children: data.branches.map((b: any) => ({
+          name: b.name || b.node || b.title,
+          node: b.node,
+          title: b.title,
+          checks: b.checks,
+          evidence: b.evidence || (b.evidence_fields ? b.evidence_fields.map((f: string) => ({ field: f })) : []),
+          children: b.children,
+          ...b,
+        })),
+      }
+    }
+    return null
+  }, [data, diagnosis])
+
   const { branchesByCategory, checksByCategory, evidenceByCategory } = useMemo(() => {
-    const branches = flattenBranches(diagnosis)
+    const branches = flattenBranches(diagnosisNode)
 
     const byCat: Record<string, DiagnosisBranch[]> = {
       '量不足': [],
@@ -150,7 +186,7 @@ export default function DiagnosisTree({ diagnosis }: DiagnosisTreeProps) {
       checksByCategory: checksByCatFinal,
       evidenceByCategory: evidenceCat,
     }
-  }, [diagnosis])
+  }, [diagnosisNode])
 
   const categories = Object.keys(symptomCategories)
 

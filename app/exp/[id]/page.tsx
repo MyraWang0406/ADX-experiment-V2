@@ -284,7 +284,7 @@ export default async function ExperimentPage({ params, searchParams }: Experimen
             />
             {/* 【防 500】DiagnosisTree 需要 diagnosis_tree 数据，使用可选链和 fallback */}
             <DiagnosisTree 
-              data={safeExperiment.diagnosis_tree || { root: '', branches: [] }}
+              data={safeExperiment.diagnosis_tree || null}
               narrative={safeExperiment.narrative || ''}
             />
           </div>

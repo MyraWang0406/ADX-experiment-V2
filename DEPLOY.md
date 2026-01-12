@@ -25,50 +25,59 @@ git push -u origin main
 
 ## Cloudflare Pages 部署
 
-### 1. 连接 GitHub 仓库
+### 方式一：Dashboard 自动部署（推荐）
 
-1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
-2. 进入 **Pages** 部分
-3. 点击 **Create a project**
-4. 选择 **Connect to Git**
-5. 授权 GitHub 并选择仓库 `MyraWang0406/ADX-experiment`
+#### 部署命令（通过 Dashboard，无需手动命令）
 
-### 2. 构建配置（最简单配置）
+1. **访问 Cloudflare Dashboard**
+   - 登录：https://dash.cloudflare.com/
+   - 进入 **Pages** → **Create a project**
 
-Cloudflare Pages 会自动检测 Next.js，使用以下配置：
+2. **连接 GitHub**
+   - 选择 **Connect to Git**
+   - 授权并选择仓库：`MyraWang0406/ADX-experiment`
+   - 选择分支：`main`
 
-**Framework preset:** `Next.js` (自动检测)
+3. **配置构建设置**
+   ```
+   Framework preset: Next.js (自动检测)
+   Build command: npm run build
+   Build output directory: .next
+   Root directory: / (留空)
+   Node.js version: 18
+   ```
 
-**Build command:** 
+4. **保存并部署**
+   - 点击 **Save and Deploy**
+   - 等待构建完成（2-5 分钟）
+
+### 方式二：Wrangler CLI 手动部署
+
+#### 前置步骤
+```bash
+# 安装 Wrangler
+npm install -g wrangler
+
+# 登录 Cloudflare
+wrangler login
 ```
+
+#### 部署命令
+```bash
+# 构建
 npm run build
+
+# 部署
+npx wrangler pages deploy .next --project-name=adx-experiment
 ```
 
-**Build output directory:** 
-```
-.next
-```
+### 自动部署
 
-**Root directory:** `/` (留空，使用项目根目录)
+连接 GitHub 后，每次推送到 `main` 分支都会自动触发部署。
 
-**Node.js version:** `18` 或更高（Cloudflare 默认）
+### 详细说明
 
-**Environment variables:** 无需特殊环境变量
-
-### 3. 一键部署
-
-连接 GitHub 后，Cloudflare 会自动：
-- 检测 Next.js 框架
-- 使用默认构建命令 `npm run build`
-- 自动部署到 `.next` 输出目录
-
-### 4. 自动部署
-
-连接后，每次推送到 `main` 分支都会自动触发部署。
-
-### 5. 自定义域名（可选）
-
-在 Cloudflare Pages 项目设置中可以绑定自定义域名。
+查看 `CLOUDFLARE_DEPLOY.md` 获取完整的部署指南和故障排除。
 
 ## 本地构建测试
 
