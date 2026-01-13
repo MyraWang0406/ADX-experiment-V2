@@ -73,7 +73,7 @@ export default function ExperimentSummaryCard({ experiment, status, conclusion }
         const owners = extractOwners(adxV1)
         return owners.slice(0, 2).map(o => String(o))
       }
-      
+
       // Fallback: 手动提取（兼容标准格式）
       const ownersSet = new Set<string>()
       if (data?.pipeline) {
@@ -109,7 +109,7 @@ export default function ExperimentSummaryCard({ experiment, status, conclusion }
       return []
     }
   })()
-  
+
   // 【防 500】获取 owner 颜色，未命中时使用默认样式
   const getOwnerColor = (owner: string): { bg: string; text: string } => {
     return ownerColors[owner] || ownerColors['Infra'] || { bg: 'bg-gray-100', text: 'text-gray-700' }
@@ -124,7 +124,8 @@ export default function ExperimentSummaryCard({ experiment, status, conclusion }
   const statusStyle = statusConfig[status]
 
   return (
-    <Link href={`/exp/${id}`} className="block group">
+    // ✅ 静态导出 + trailingSlash:true 时，详情页目录形态是 /exp/<id>/
+    <Link href={`/exp/${id}/`} className="block group">
       <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all duration-200 h-full flex flex-col">
         {/* 标题和状态 Badge */}
         <div className="flex items-start justify-between mb-3">
@@ -195,8 +196,8 @@ export default function ExperimentSummaryCard({ experiment, status, conclusion }
                   }`}
                 />
                 <span className="text-xs text-gray-700">
-                  {Array.isArray(['d1_retention', 'early_exit_rate', 'complaint_rate', 'timeout_rate', 'fill_rate']) && 
-                   typeof item?.name === 'string' && 
+                  {Array.isArray(['d1_retention', 'early_exit_rate', 'complaint_rate', 'timeout_rate', 'fill_rate']) &&
+                   typeof item?.name === 'string' &&
                    ['d1_retention', 'early_exit_rate', 'complaint_rate', 'timeout_rate', 'fill_rate'].includes(item.name) ? (
                     <Term labelKey={item.name} type="metric">{item.name}</Term>
                   ) : item.name}

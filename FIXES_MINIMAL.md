@@ -252,3 +252,7 @@ const urlView = parseView(searchParams?.get('view'))
 4. **布局优化：** 根据 tab 状态动态调整布局，避免大留白
 5. **响应式设计：** 检查项使用 grid 布局，适配不同屏幕尺寸
 
+
+
+
+

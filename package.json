@@ -3,15 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000",
-    "dev:clean": "npx kill-port 3000 && next dev -p 3000",
+    "dev": "next dev -p 3100",
+    "dev:clean": "npx kill-port 3100 && next dev -p 3100",
     "build": "next build",
-    "start": "next start",
+    "build:export": "next build",
+    "start": "next start -p 3100",
     "lint": "next lint",
     "eval": "node scripts/eval.js",
     "inspect:mocks": "tsx scripts/inspect-mocks.ts"
   },
   "dependencies": {
+    "lodash": "^4.17.21",
     "next": "^14.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

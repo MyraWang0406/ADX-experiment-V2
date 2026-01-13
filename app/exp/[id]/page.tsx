@@ -1,4 +1,6 @@
 import { notFound } from 'next/navigation'
+import { Suspense } from 'react'
+
 import PipelineMap from '@/components/PipelineMap'
 import FunnelComparison from '@/components/FunnelComparison'
 import CategoryDistribution from '@/components/CategoryDistribution'
@@ -29,24 +31,27 @@ import { normalizePipeline } from '@/lib/normalize-pipeline'
 import DebugFingerprint from '@/components/DebugFingerprint'
 import ExperimentDetailClient, { ViewSwitcherInClient } from '@/components/exp/ExperimentDetailClient'
 
-// ✅ 静态导出时：禁止动态 params fallback
+// ✅ 静态导出：动态路由必须“列出所有 params”，并禁止动态 fallback
 export const dynamicParams = false
+export const dynamic = 'force-static'
+export const revalidate = false
 
-// ✅ 静态导出必须提供：把所有可导出的 id 列出来
 export async function generateStaticParams() {
+  const fallback = ['exp_001', 'exp_002', 'exp_003']
+
   try {
     const list: any[] = await loadExperimentsList()
-    const ids = (list || [])
+
+    const ids = (Array.isArray(list) ? list : [])
       .map((x: any) => String(x?.experiment_id ?? x?.id ?? x?.exp_id ?? '').trim())
       .filter(Boolean)
 
-    // 兜底：避免 list 为空导致一个页面都不导出
-    const fallback = ['exp_001', 'exp_002', 'exp_003']
-    const finalIds = ids.length ? ids : fallback
+    const uniq = Array.from(new Set(ids))
+    const finalIds = uniq.length ? uniq : fallback
 
     return finalIds.map((id) => ({ id }))
   } catch (e) {
-    return ['exp_001', 'exp_002', 'exp_003'].map((id) => ({ id }))
+    return fallback.map((id) => ({ id }))
   }
 }
 
@@ -59,40 +64,46 @@ interface ExperimentPageProps {
   }
 }
 
+function toNumber(v: any) {
+  const n = typeof v === 'number' ? v : Number(v)
+  return Number.isFinite(n) ? n : null
+}
+
+// 把 v1 标量 ocpx（baseline/treatment 是 number）转成 normalizeOCPXData 能吃的结构
+function wrapScalarOCPX(ocpx: any) {
+  if (!ocpx || typeof ocpx !== 'object') return null
+
+  const b = toNumber((ocpx as any).baseline)
+  const t = toNumber((ocpx as any).treatment)
+  if (b === null && t === null) return null
+
+  return {
+    baseline: { multiplier: b !== null ? [b] : [], actual_cpa: [], spend: [], target_cpa: [] },
+    treatment: { multiplier: t !== null ? [t] : [], actual_cpa: [], spend: [], target_cpa: [] },
+    hours: [0],
+  }
+}
+
 export default async function ExperimentPage({ params, searchParams }: ExperimentPageProps) {
   const expId = params?.id
-
-  if (!expId || typeof expId !== 'string') {
-    notFound()
-    return null as any
-  }
+  if (!expId || typeof expId !== 'string') notFound()
 
   let experiment: ExperimentData | null = null
-  let dataSource = 'unknown'
 
   try {
     const data = await loadExperiment(expId, undefined, searchParams)
-    if (!data || typeof data !== 'object') {
-      notFound()
-      return null as any
-    }
+    if (!data || typeof data !== 'object') notFound()
     experiment = data as ExperimentData
-
-    // ✅ 用 loader 注入的 _source（比你之前靠 _adx_v1 猜更准）
-    dataSource = String((experiment as any)?._source || `/_mock/experiments/${expId}.json`)
   } catch (error) {
     console.error(`Failed to load experiment ${expId}:`, error)
     notFound()
-    return null as any
   }
 
-  if (!experiment) {
-    notFound()
-    return null as any
-  }
+  if (!experiment) notFound()
 
   const normalizedPipeline = normalizePipeline(experiment)
 
+  // ✅ 关键：normalizePipeline 覆盖原 pipeline 的脏结构
   const safeExperiment: ExperimentData = {
     ...experiment,
     experiment_id: (experiment as any).experiment_id || (experiment as any).id || expId,
@@ -102,12 +113,25 @@ export default async function ExperimentPage({ params, searchParams }: Experimen
     primary_segment: (experiment as any).primary_segment || { id: '', name: '', dims: {} },
 
     pipeline: {
-      ...normalizedPipeline,
       ...(experiment as any).pipeline,
+      ...normalizedPipeline,
     },
 
     diagnosis_tree: (experiment as any).diagnosis_tree || { root: '', branches: [] },
   }
+
+  const dataSource =
+    String((safeExperiment as any)?._source || '') || `experiment:${safeExperiment.experiment_id}`
+
+  const ocpxCandidate =
+    (safeExperiment.pipeline as any)?.ocpx_timeseries ||
+    (safeExperiment.pipeline as any)?.bidding_budget?.dsp?.ocpx ||
+    (safeExperiment as any)?._adx_v1?.bidding_budget?.dsp?.ocpx
+
+  const ocpxData =
+    (safeExperiment.pipeline as any)?.ocpx_timeseries ||
+    wrapScalarOCPX(ocpxCandidate) ||
+    { baseline: [], treatment: [] }
 
   return (
     <>
@@ -127,159 +151,163 @@ export default async function ExperimentPage({ params, searchParams }: Experimen
             </div>
           </div>
 
-          <ExperimentDetailClient data={safeExperiment} dataSource={dataSource}>
-            {/* 搜索词&意图 */}
-            <div id="query-intent" className="space-y-6">
-              {safeExperiment.pipeline?.query_stats && (
-                <>
-                  <QueryConversionFunnel
-                    data={{ query_stats: safeExperiment.pipeline.query_stats }}
+          <Suspense fallback={<div className="p-4 text-center text-gray-500">加载实验详情中...</div>}>
+            <ExperimentDetailClient data={safeExperiment} dataSource={dataSource}>
+              {/* 搜索词&意图 */}
+              <div id="query-intent" className="space-y-6">
+                {safeExperiment.pipeline?.query_stats && (
+                  <>
+                    <QueryConversionFunnel
+                      data={{ query_stats: safeExperiment.pipeline.query_stats }}
+                      narrative={safeExperiment.narrative || ''}
+                    />
+                    <SearchQueryPanel
+                      data={{ query_stats: safeExperiment.pipeline.query_stats }}
+                      narrative={safeExperiment.narrative || ''}
+                    />
+                  </>
+                )}
+
+                {safeExperiment.pipeline?.query_intent && (
+                  <QueryIntentPanel
+                    data={{ query_intent: safeExperiment.pipeline.query_intent }}
                     narrative={safeExperiment.narrative || ''}
                   />
-                  <SearchQueryPanel
-                    data={{ query_stats: safeExperiment.pipeline.query_stats }}
+                )}
+
+                {safeExperiment.pipeline?.query_report && (
+                  <QueryPanel
+                    data={{ query_report: safeExperiment.pipeline.query_report }}
                     narrative={safeExperiment.narrative || ''}
                   />
-                </>
-              )}
-              {safeExperiment.pipeline?.query_intent && (
-                <QueryIntentPanel
-                  data={{ query_intent: safeExperiment.pipeline.query_intent }}
-                  narrative={safeExperiment.narrative || ''}
-                />
-              )}
-              {safeExperiment.pipeline?.query_report && (
-                <QueryPanel
-                  data={{ query_report: safeExperiment.pipeline.query_report }}
-                  narrative={safeExperiment.narrative || ''}
-                />
-              )}
-            </div>
-
-            {/* 落地页&转化 */}
-            <div id="landing-conversion" className="space-y-6">
-              {safeExperiment.pipeline?.landing_stats && (
-                <LandingConversionPanel
-                  data={{ landing_stats: safeExperiment.pipeline.landing_stats }}
-                  narrative={safeExperiment.narrative || ''}
-                />
-              )}
-            </div>
-
-            {/* 出价&预算 */}
-            <div id="bidding-budget" className="space-y-6">
-              {(safeExperiment.pipeline?.bid_strategy ||
-                safeExperiment.pipeline?.pacing ||
-                (safeExperiment.pipeline as any)?.bidding_budget ||
-                (safeExperiment.pipeline as any)?.supply_coverage ||
-                (safeExperiment.pipeline as any)?.adx_exchange ||
-                (safeExperiment as any)?._adx_v1?.bidding_budget ||
-                (safeExperiment as any)?._adx_v1?.supply_coverage ||
-                (safeExperiment as any)?._adx_v1?.adx_exchange) && (
-                <BiddingBudgetPanel
-                  data={{
-                    bid_strategy: safeExperiment.pipeline?.bid_strategy,
-                    pacing: safeExperiment.pipeline?.pacing,
-                    bidding_budget:
-                      (safeExperiment.pipeline as any)?.bidding_budget || (safeExperiment as any)?._adx_v1?.bidding_budget,
-                    supply_coverage:
-                      (safeExperiment.pipeline as any)?.supply_coverage || (safeExperiment as any)?._adx_v1?.supply_coverage,
-                    adx_exchange:
-                      (safeExperiment.pipeline as any)?.adx_exchange || (safeExperiment as any)?._adx_v1?.adx_exchange,
-                  }}
-                  narrative={safeExperiment.narrative || ''}
-                  pipeline={safeExperiment.pipeline}
-                />
-              )}
-            </div>
-
-            {/* 流量覆盖 */}
-            <div id="traffic-coverage" className="space-y-6">
-              {safeExperiment.pipeline?.coverage_breakdown && (
-                <TrafficCoveragePanel
-                  data={{ coverage_breakdown: safeExperiment.pipeline.coverage_breakdown }}
-                  narrative={safeExperiment.narrative || ''}
-                />
-              )}
-
-              <PipelineMap
-                data={
-                  safeExperiment.pipeline ||
-                  { funnel: { baseline: {}, treatment: {} }, category_dist: { baseline: {}, treatment: {} } }
-                }
-                narrative={safeExperiment.narrative || ''}
-                processKpis={safeExperiment.kpi_framework?.process_kpis}
-              />
-
-              <FunnelComparison
-                data={safeExperiment.pipeline?.funnel || { baseline: {}, treatment: {} }}
-                narrative={safeExperiment.narrative || ''}
-              />
-
-              {safeExperiment.pipeline?.search && (
-                <SearchIntentPanel data={safeExperiment.pipeline.search} narrative={safeExperiment.narrative || ''} />
-              )}
-              {safeExperiment.pipeline?.supply && (
-                <SupplyPanel data={safeExperiment.pipeline.supply} narrative={safeExperiment.narrative || ''} />
-              )}
-            </div>
-
-            {/* 排序策略链路 */}
-            <div id="ranking-strategy" className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-900 border-b-2 border-blue-200 pb-2">
-                排序策略（Ranking / Relevance）
-              </h2>
-
-              <CategoryDistribution
-                data={safeExperiment.pipeline?.category_dist || { baseline: {}, treatment: {} }}
-                narrative={safeExperiment.narrative || ''}
-              />
-
-              <div id="topn">
-                <TopNFeed
-                  data={safeExperiment.pipeline?.topN_feed || { baseline: [], treatment: [] }}
-                  narrative={safeExperiment.narrative || ''}
-                />
+                )}
               </div>
-            </div>
 
-            {/* 出价策略链路 */}
-            <div id="bidding-strategy" className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-900 border-b-2 border-blue-200 pb-2">
-                出价策略（Bidding / Pacing / Auction）
-              </h2>
+              {/* 落地页&转化 */}
+              <div id="landing-conversion" className="space-y-6">
+                {safeExperiment.pipeline?.landing_stats && (
+                  <LandingConversionPanel
+                    data={{ landing_stats: safeExperiment.pipeline.landing_stats }}
+                    narrative={safeExperiment.narrative || ''}
+                  />
+                )}
+              </div>
 
-              <AuctionBidPanel
-                auction={safeExperiment.pipeline?.auction}
-                bid={safeExperiment.pipeline?.bid}
-                reasons={safeExperiment.pipeline?.reasons}
-                narrative={safeExperiment.narrative || ''}
-              />
+              {/* 出价&预算 */}
+              <div id="bidding-budget" className="space-y-6">
+                {(safeExperiment.pipeline?.bid_strategy ||
+                  safeExperiment.pipeline?.pacing ||
+                  (safeExperiment.pipeline as any)?.bidding_budget ||
+                  (safeExperiment.pipeline as any)?.supply_coverage ||
+                  (safeExperiment.pipeline as any)?.adx_exchange ||
+                  (safeExperiment as any)?._adx_v1?.bidding_budget ||
+                  (safeExperiment as any)?._adx_v1?.supply_coverage ||
+                  (safeExperiment as any)?._adx_v1?.adx_exchange) && (
+                  <BiddingBudgetPanel
+                    data={{
+                      bid_strategy: safeExperiment.pipeline?.bid_strategy,
+                      pacing: safeExperiment.pipeline?.pacing,
+                      bidding_budget:
+                        (safeExperiment.pipeline as any)?.bidding_budget ||
+                        (safeExperiment as any)?._adx_v1?.bidding_budget,
+                      supply_coverage:
+                        (safeExperiment.pipeline as any)?.supply_coverage ||
+                        (safeExperiment as any)?._adx_v1?.supply_coverage,
+                      adx_exchange:
+                        (safeExperiment.pipeline as any)?.adx_exchange ||
+                        (safeExperiment as any)?._adx_v1?.adx_exchange,
+                    }}
+                    narrative={safeExperiment.narrative || ''}
+                    pipeline={safeExperiment.pipeline}
+                  />
+                )}
+              </div>
 
-              {/* ✅ OCPX：优先 timeseries，其次 v1 标量 */}
-              <OCPXCurve
-                data={
-                  safeExperiment.pipeline?.ocpx_timeseries ||
-                  (safeExperiment.pipeline as any)?.bidding_budget?.dsp?.ocpx ||
-                  (safeExperiment as any)?._adx_v1?.bidding_budget?.dsp?.ocpx ||
-                  { baseline: [], treatment: [] }
-                }
-                narrative={safeExperiment.narrative || ''}
-              />
-            </div>
+              {/* 流量覆盖 */}
+              <div id="traffic-coverage" className="space-y-6">
+                {safeExperiment.pipeline?.coverage_breakdown && (
+                  <TrafficCoveragePanel
+                    data={{ coverage_breakdown: safeExperiment.pipeline.coverage_breakdown }}
+                    narrative={safeExperiment.narrative || ''}
+                  />
+                )}
 
-            {/* 原因诊断 */}
-            <div id="diagnosis">
-              <ViewSwitcherInClient />
+                <PipelineMap
+                  data={
+                    safeExperiment.pipeline || {
+                      funnel: { baseline: {}, treatment: {} },
+                      category_dist: { baseline: {}, treatment: {} },
+                    }
+                  }
+                  narrative={safeExperiment.narrative || ''}
+                  processKpis={safeExperiment.kpi_framework?.process_kpis}
+                />
 
-              <ReasonDistribution
-                data={safeExperiment.pipeline?.reasons || (safeExperiment as any)?._adx_v1?.reasons}
-                narrative={safeExperiment.narrative || ''}
-              />
+                <FunnelComparison
+                  data={safeExperiment.pipeline?.funnel || { baseline: {}, treatment: {} }}
+                  narrative={safeExperiment.narrative || ''}
+                />
 
-              <DiagnosisTree data={(safeExperiment as any).diagnosis_tree || null} narrative={safeExperiment.narrative || ''} />
-            </div>
-          </ExperimentDetailClient>
+                {safeExperiment.pipeline?.search && (
+                  <SearchIntentPanel
+                    data={safeExperiment.pipeline.search}
+                    narrative={safeExperiment.narrative || ''}
+                  />
+                )}
+
+                {safeExperiment.pipeline?.supply && (
+                  <SupplyPanel data={safeExperiment.pipeline.supply} narrative={safeExperiment.narrative || ''} />
+                )}
+              </div>
+
+              {/* 排序策略链路 */}
+              <div id="ranking-strategy" className="space-y-6">
+                <h2 className="text-2xl font-bold text-gray-900 border-b-2 border-blue-200 pb-2">
+                  排序策略（Ranking / Relevance）
+                </h2>
+
+                <CategoryDistribution
+                  data={safeExperiment.pipeline?.category_dist || { baseline: {}, treatment: {} }}
+                  narrative={safeExperiment.narrative || ''}
+                />
+
+                <div id="topn">
+                  <TopNFeed
+                    data={safeExperiment.pipeline?.topN_feed || { baseline: [], treatment: [] }}
+                    narrative={safeExperiment.narrative || ''}
+                  />
+                </div>
+              </div>
+
+              {/* 出价策略链路 */}
+              <div id="bidding-strategy" className="space-y-6">
+                <h2 className="text-2xl font-bold text-gray-900 border-b-2 border-blue-200 pb-2">
+                  出价策略（Bidding / Pacing / Auction）
+                </h2>
+
+                <AuctionBidPanel
+                  auction={safeExperiment.pipeline?.auction}
+                  bid={safeExperiment.pipeline?.bid}
+                  reasons={safeExperiment.pipeline?.reasons}
+                  narrative={safeExperiment.narrative || ''}
+                />
+
+                <OCPXCurve data={ocpxData} narrative={safeExperiment.narrative || ''} />
+              </div>
+
+              {/* 原因诊断 */}
+              <div id="diagnosis">
+                <ViewSwitcherInClient />
+
+                <ReasonDistribution
+                  data={safeExperiment.pipeline?.reasons || (safeExperiment as any)?._adx_v1?.reasons}
+                  narrative={safeExperiment.narrative || ''}
+                />
+
+                <DiagnosisTree data={(safeExperiment as any).diagnosis_tree || null} narrative={safeExperiment.narrative || ''} />
+              </div>
+            </ExperimentDetailClient>
+          </Suspense>
         </div>
       </div>
     </>

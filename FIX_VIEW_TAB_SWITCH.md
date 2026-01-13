@@ -209,3 +209,7 @@ export default function ViewSwitcher() {
    - `ViewSwitcher` 只使用 `useViewFilter()`，不再尝试多个 Context
    - 移除 try/catch 和 fallback 逻辑，简化代码
 
+
+
+
+

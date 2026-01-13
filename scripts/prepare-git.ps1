@@ -17,3 +17,7 @@ Write-Host "  git remote add origin https://github.com/MyraWang0406/ADX-experime
 Write-Host "  git branch -M main" -ForegroundColor White
 Write-Host "  git push -u origin main" -ForegroundColor White
 
+
+
+
+

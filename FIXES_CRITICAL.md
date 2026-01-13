@@ -318,3 +318,7 @@ export function formatPercent(value: number | null | undefined, decimals: number
 4. **中文化：** 检查项显示中文，code 作为辅助信息
 5. **0 值正确处理：** 使用 `== null` 而不是 `!value` 判断缺失值
 
+
+
+
+
