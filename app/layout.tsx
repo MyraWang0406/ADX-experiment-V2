@@ -1,31 +1,25 @@
-import type { Metadata } from 'next'
 import './globals.css'
-import dynamic from 'next/dynamic'
-
-// 动态导入 Client Component，避免 SSR 问题
-const ContactAuthor = dynamic(() => import('@/components/ContactAuthor'), {
-  ssr: false,
-})
+import type { Metadata } from 'next'
+import ContactAuthor from '@/components/ContactAuthor'
 
 export const metadata: Metadata = {
-  title: 'AI 推荐广告实验 Dashboard',
-  description: '搜广推可视化实验分析平台',
+  title: '搜索广告实验可视化',
+  description: 'ADX Experiment Dashboard',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // ✅ 生产环境展示联系作者；开发环境默认不展示（避免你本地一直看到）
+  const showContactAuthor =
+    process.env.NODE_ENV === 'production' ||
+    process.env.NEXT_PUBLIC_SHOW_CONTACT_AUTHOR === '1'
+
   return (
     <html lang="zh-CN">
-      <body className="bg-gray-50">
+      <body className="min-h-screen bg-white">
         {children}
-        <ContactAuthor />
+
+        {showContactAuthor ? <ContactAuthor /> : null}
       </body>
     </html>
   )
 }
-
-
-

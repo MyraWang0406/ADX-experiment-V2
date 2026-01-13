@@ -31,16 +31,6 @@ interface DiagnosisTreeProps {
   narrative?: string
 }
 
-function formatCheckText(raw: string): { zh: string; code?: string } {
-  const s = String(raw || '').trim()
-  // 兼容 "BID_TOO_LOW(出价低)" 或 "出价低(BID_TOO_LOW)" 等
-  const m1 = s.match(/^([A-Z0-9_]+)\((.+)\)$/)
-  if (m1) return { code: m1[1], zh: m1[2] }
-  const m2 = s.match(/^(.+)\(([A-Z0-9_]+)\)$/)
-  if (m2) return { code: m2[2], zh: m2[1] }
-  return { zh: s }
-}
-
 // 一级：症状分类
 const symptomCategories: Record<string, { zh: string; desc: string }> = {
   '量不足': { zh: '量不足', desc: '广告填充不足或覆盖率低' },
@@ -49,7 +39,7 @@ const symptomCategories: Record<string, { zh: string; desc: string }> = {
   'OCPX不稳': { zh: 'OCPX不稳', desc: 'OCPX控制不稳定，CPA波动大' },
 }
 
-// 二级：原因 bucket 映射
+// 二级：原因 bucket 映射（用于把纯英文 code 映射成中文）
 const reasonBucketMap: Record<string, { zh: string; category: string }> = {
   'BID_TOO_LOW': { zh: '出价低', category: '量不足' },
   'BUDGET_EXHAUSTED': { zh: '预算耗尽', category: '量不足' },
@@ -69,15 +59,31 @@ const reasonBucketMap: Record<string, { zh: string; category: string }> = {
   'LEARNING_RESET': { zh: '学习重置', category: 'OCPX不稳' },
 }
 
-function getSymptomCategory(branch: DiagnosisBranch): string {
-  const s = String(branch?.name ?? branch?.node ?? branch?.title ?? '')
-  // 修复大小写/写法不一致导致分类错乱
-  if (/ocpx/i.test(s)) return 'OCPX不稳'
-  if (s.includes('量不足')) return '量不足'
-  if (s.includes('相关性不足')) return '相关性不足'
-  if (s.includes('体验')) return '体验受损'
-  // fallback：unknown
-  return '量不足'
+// ✅ 证据字段（你截图里底部英文的根源）
+const evidenceFieldLabelMap: Record<string, { zh: string; desc?: string }> = {
+  'pipeline.funnel': { zh: '漏斗数据', desc: '曝光→点击→转化等关键漏斗指标' },
+  'pipeline.reasons.*.rerank': { zh: '重排原因明细', desc: '重排/过滤阶段的原因分布' },
+  'pipeline.reasons.*.auction': { zh: '拍卖原因明细', desc: '拍卖阶段的原因分布' },
+  'metrics_summary.*.guardrails': { zh: '护栏指标', desc: '稳定性/风险控制指标' },
+  'pipeline.ocpx_timeseries': { zh: 'OCPX 曲线数据', desc: '倍率/CPA 等随时间变化' },
+  'breakdown.by_hour.*.fill_rate': { zh: '分时填充率', desc: '按小时的 fill rate 变化' },
+}
+
+function formatCheckText(raw: string): { zh: string; code?: string } {
+  const s = String(raw || '').trim()
+
+  // 兼容 "BID_TOO_LOW(出价低)" 或 "出价低(BID_TOO_LOW)"
+  const m1 = s.match(/^([A-Z0-9_]+)\((.+)\)$/)
+  if (m1) return { code: m1[1], zh: m1[2] }
+  const m2 = s.match(/^(.+)\(([A-Z0-9_]+)\)$/)
+  if (m2) return { code: m2[2], zh: m2[1] }
+
+  // 纯 code：做中文映射
+  if (/^[A-Z0-9_]+$/.test(s) && reasonBucketMap[s]) {
+    return { code: s, zh: reasonBucketMap[s].zh }
+  }
+
+  return { zh: s }
 }
 
 function flattenBranches(root: DiagnosisBranch | null | undefined): DiagnosisBranch[] {
@@ -96,15 +102,57 @@ function flattenBranches(root: DiagnosisBranch | null | undefined): DiagnosisBra
   return out
 }
 
+function getSymptomCategory(branch: DiagnosisBranch): string {
+  const title = String(branch?.name ?? branch?.node ?? branch?.title ?? '')
+
+  // 从 checks 里优先推断 category（比标题可靠）
+  const checks = ([] as any[])
+    .concat(Array.isArray((branch as any).checks) ? (branch as any).checks : [])
+    .concat(Array.isArray((branch as any).reasons) ? (branch as any).reasons : [])
+
+  for (const c of checks) {
+    const s = typeof c === 'string' ? c : (c?.title || c?.symptom || c?.code || '')
+    const code = String(s || '').trim()
+    if (reasonBucketMap[code]) return reasonBucketMap[code].category
+  }
+
+  if (/ocpx/i.test(title)) return 'OCPX不稳'
+  if (title.includes('量不足')) return '量不足'
+  if (title.includes('相关性不足')) return '相关性不足'
+  if (title.includes('体验')) return '体验受损'
+  return '量不足'
+}
+
+function formatEvidence(e: any): { title: string; code?: string; desc?: string; detail?: string } {
+  if (typeof e === 'string') {
+    const meta = evidenceFieldLabelMap[e]
+    return { title: meta?.zh || e, code: meta ? e : undefined, desc: meta?.desc }
+  }
+
+  const field = typeof e?.field === 'string' ? e.field : ''
+  if (field) {
+    const meta = evidenceFieldLabelMap[field]
+    return {
+      title: meta?.zh || field,
+      code: meta ? field : undefined,
+      desc: meta?.desc,
+      detail: e?.detail ? String(e.detail) : undefined,
+    }
+  }
+
+  return {
+    title: e?.title || e?.metric || e?.name || '证据项',
+    detail: e?.detail ? String(e.detail) : undefined,
+  }
+}
+
 export default function DiagnosisTree({ data, diagnosis, narrative }: DiagnosisTreeProps) {
   const [activeCategory, setActiveCategory] = useState<string>('量不足')
 
-  // 【修复】兼容两种数据格式：data (diagnosis_tree) 或 diagnosis (DiagnosisBranch)
+  // 兼容两种数据格式：data(diagnosis_tree) 或 diagnosis(DiagnosisBranch)
   const diagnosisNode: DiagnosisBranch | null | undefined = useMemo(() => {
     if (diagnosis) return diagnosis
     if (data?.branches && Array.isArray(data.branches) && data.branches.length > 0) {
-      // 将 diagnosis_tree 格式转换为 DiagnosisBranch 格式
-      // 创建一个虚拟根节点，将所有 branches 作为 children
       return {
         name: data.root || '诊断根节点',
         children: data.branches.map((b: any) => ({
@@ -121,75 +169,55 @@ export default function DiagnosisTree({ data, diagnosis, narrative }: DiagnosisT
     return null
   }, [data, diagnosis])
 
-  const { branchesByCategory, checksByCategory, evidenceByCategory } = useMemo(() => {
+  const { checksByCategory, evidenceByCategory } = useMemo(() => {
     const branches = flattenBranches(diagnosisNode)
 
-    const byCat: Record<string, DiagnosisBranch[]> = {
-      '量不足': [],
-      '相关性不足': [],
-      '体验受损': [],
-      'OCPX不稳': [],
-    }
-
-    // 聚合 checks / evidence
     const checksCat: Record<string, any[]> = { '量不足': [], '相关性不足': [], '体验受损': [], 'OCPX不稳': [] }
     const evidenceCat: Record<string, any[]> = { '量不足': [], '相关性不足': [], '体验受损': [], 'OCPX不稳': [] }
 
     for (const b of branches) {
       const cat = getSymptomCategory(b)
-      byCat[cat] = byCat[cat] || []
-      byCat[cat].push(b)
 
-      // checks: 兼容多种字段
+      // checks
       const localChecks: any[] = []
       if (Array.isArray((b as any).checks)) localChecks.push(...((b as any).checks as any[]))
       if (Array.isArray((b as any).reasons)) localChecks.push(...((b as any).reasons as any[]))
-      if (Array.isArray((b as any).children)) {
-        // ignore (flatten already handled)
-      }
-      checksCat[cat] = checksCat[cat] || []
       for (const c of localChecks) checksCat[cat].push({ check: c })
 
       // evidence
       if (Array.isArray((b as any).evidence)) {
-        evidenceCat[cat] = evidenceCat[cat] || []
         evidenceCat[cat].push(...((b as any).evidence as any[]))
       }
     }
 
-    // 【关键修复】checks 去重，避免 “量不足出现 3 次/相关性不足出现 3 次”
+    // checks 去重
     const dedupeChecks = (items: any[]) => {
-      const uniqueMap = new Map<string, { zh: string; code?: string; checkObj?: any }>()
+      const uniqueMap = new Map<string, { zh: string; code?: string }>()
       items.forEach(({ check }) => {
         const checkStr =
           typeof check === 'string'
             ? check
-            : (check?.title || check?.symptom || String(check ?? ''))
-        const checkObj = typeof check === 'object' && check !== null ? check : null
+            : (check?.title || check?.symptom || check?.code || String(check ?? ''))
         const { zh, code } = formatCheckText(checkStr)
         const key = (code || zh).trim()
         if (!key) return
-        if (!uniqueMap.has(key)) uniqueMap.set(key, { zh, code, checkObj })
+        if (!uniqueMap.has(key)) uniqueMap.set(key, { zh, code })
       })
       return [...uniqueMap.values()]
     }
 
-    const checksByCatFinal: Record<string, any[]> = {
-      '量不足': dedupeChecks(checksCat['量不足'] || []),
-      '相关性不足': dedupeChecks(checksCat['相关性不足'] || []),
-      '体验受损': dedupeChecks(checksCat['体验受损'] || []),
-      'OCPX不稳': dedupeChecks(checksCat['OCPX不稳'] || []),
-    }
-
     return {
-      branchesByCategory: byCat,
-      checksByCategory: checksByCatFinal,
+      checksByCategory: {
+        '量不足': dedupeChecks(checksCat['量不足']),
+        '相关性不足': dedupeChecks(checksCat['相关性不足']),
+        '体验受损': dedupeChecks(checksCat['体验受损']),
+        'OCPX不稳': dedupeChecks(checksCat['OCPX不稳']),
+      },
       evidenceByCategory: evidenceCat,
     }
   }, [diagnosisNode])
 
   const categories = Object.keys(symptomCategories)
-
   const activeChecks = checksByCategory[activeCategory] || []
   const activeEvidence = evidenceByCategory[activeCategory] || []
 
@@ -201,10 +229,11 @@ export default function DiagnosisTree({ data, diagnosis, narrative }: DiagnosisT
           <p className="mt-1 text-sm text-gray-600">
             大原因并列展示，点击查看该类下的证据与检查项（已去重）
           </p>
+          {narrative ? <div className="mt-2 text-sm text-gray-600">{narrative}</div> : null}
         </div>
       </div>
 
-      {/* 症状分类 pills：一行 3/4 个，避免 1 行 1 崩溃体验 */}
+      {/* pills */}
       <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2">
         {categories.map((cat) => {
           const isActive = cat === activeCategory
@@ -215,9 +244,7 @@ export default function DiagnosisTree({ data, diagnosis, narrative }: DiagnosisT
               key={cat}
               className={[
                 'text-left rounded-lg border px-3 py-2 transition',
-                isActive
-                  ? 'border-blue-300 bg-blue-50'
-                  : 'border-gray-200 bg-white hover:bg-gray-50',
+                isActive ? 'border-blue-300 bg-blue-50' : 'border-gray-200 bg-white hover:bg-gray-50',
               ].join(' ')}
               onClick={() => setActiveCategory(cat)}
             >
@@ -231,7 +258,7 @@ export default function DiagnosisTree({ data, diagnosis, narrative }: DiagnosisT
         })}
       </div>
 
-      {/* 当前分类下的 checks */}
+      {/* checks */}
       <div className="mt-6">
         <div className="text-sm font-semibold text-gray-900">检查项（已去重）</div>
         {activeChecks.length === 0 ? (
@@ -244,28 +271,31 @@ export default function DiagnosisTree({ data, diagnosis, narrative }: DiagnosisT
                 className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2"
               >
                 <div className="text-sm text-gray-900">{c.zh}</div>
-                {c.code ? <div className="text-xs text-gray-500 mt-0.5">{c.code}</div> : null}
+                {c.code ? <div className="text-xs text-gray-500 mt-0.5 font-mono">{c.code}</div> : null}
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* 当前分类下的 evidence */}
+      {/* evidence */}
       <div className="mt-6">
         <div className="text-sm font-semibold text-gray-900">证据</div>
         {activeEvidence.length === 0 ? (
           <div className="mt-2 text-sm text-gray-500">暂无证据</div>
         ) : (
           <div className="mt-3 space-y-2">
-            {activeEvidence.slice(0, 12).map((e: any, idx: number) => (
-              <div key={idx} className="rounded-md border border-gray-200 bg-white px-3 py-2">
-                <div className="text-sm text-gray-900">
-                  {e?.title || e?.metric || e?.name || '证据项'}
+            {activeEvidence.slice(0, 12).map((e: any, idx: number) => {
+              const info = formatEvidence(e)
+              return (
+                <div key={idx} className="rounded-md border border-gray-200 bg-white px-3 py-2">
+                  <div className="text-sm text-gray-900">{info.title}</div>
+                  {info.code ? <div className="text-xs text-gray-500 mt-0.5 font-mono">{info.code}</div> : null}
+                  {info.desc ? <div className="text-xs text-gray-600 mt-1">{info.desc}</div> : null}
+                  {info.detail ? <div className="text-xs text-gray-600 mt-1">{info.detail}</div> : null}
                 </div>
-                {e?.detail ? <div className="text-xs text-gray-600 mt-1">{String(e.detail)}</div> : null}
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

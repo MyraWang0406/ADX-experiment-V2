@@ -1,17 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  async rewrites() {
-    return [
-      // 将 /mock/* 映射到 /_mock/*，保持向后兼容
-      {
-        source: '/mock/:path*',
-        destination: '/_mock/:path*',
-      },
-    ]
+
+  // Cloudflare Pages 静态站点：用 next export 模式产出 out/
+  output: 'export',
+  trailingSlash: true,
+
+  // 静态导出不支持 Next Image 的在线优化
+  images: {
+    unoptimized: true,
   },
 }
 
 module.exports = nextConfig
-
-
