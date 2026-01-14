@@ -1,9 +1,7 @@
-import Link from 'next/link'
 import { Suspense } from 'react'
-import { nodeNames } from '@/lib/translations'
 import ExperimentSummaryCard from '@/components/ExperimentSummaryCard'
 import DebugPanel from '@/components/DebugPanel'
-import { safePercentChange, formatPercentChange } from '@/lib/utils'
+
 // Server Component: 直接使用 server-only 函数读取数据（不使用 HTTP fetch）
 import { loadExperimentsList, loadExperimentData } from '@/lib/server/data-loader'
 
@@ -84,17 +82,21 @@ export default async function Home() {
   // 缺失的数据直接跳过，并在开发态 console 给出提示
   const loaded = await Promise.all(
     experimentsList.map(async (exp: any): Promise<ExperimentWithData | null> => {
-      const data = await loadExperimentData(exp.experiment_id)
+      const id = String(exp?.experiment_id ?? exp?.id ?? exp?.exp_id ?? '').trim()
+      if (!id) return null
+
+      const data = await loadExperimentData(id)
       if (!data) {
         if (process.env.NODE_ENV === 'development') {
-          console.warn(`[Home] Experiment ${exp.experiment_id} not found, skipped`)
+          console.warn(`[Home] Experiment ${id} not found, skipped`)
         }
         return null
       }
+
       return {
-        id: exp.experiment_id,
-        title: exp.title,
-        created_at: data.created_at || exp.created_at || new Date().toISOString(),
+        id,
+        title: exp?.title || data?.title || id,
+        created_at: data?.created_at || exp?.created_at || new Date().toISOString(),
         data,
       }
     })
@@ -134,9 +136,7 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                搜广推实验控制台
-              </h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">搜广推实验控制台</h1>
               <p className="mt-2 text-sm sm:text-base text-gray-600">
                 统一查看实验结果、护栏风险、瓶颈诊断与策略建议
               </p>
@@ -146,13 +146,19 @@ export default async function Home() {
               <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-gray-50 text-gray-700 border-gray-200">
                 总实验 {total}
               </span>
-              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusDisplay('ALERT').color}`}>
+              <span
+                className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusDisplay('ALERT').color}`}
+              >
                 异常 {alertCount}
               </span>
-              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusDisplay('WARNING').color}`}>
+              <span
+                className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusDisplay('WARNING').color}`}
+              >
                 关注 {warningCount}
               </span>
-              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusDisplay('NORMAL').color}`}>
+              <span
+                className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusDisplay('NORMAL').color}`}
+              >
                 正常 {normalCount}
               </span>
             </div>
@@ -172,9 +178,15 @@ export default async function Home() {
             />
           ))}
         </div>
+
+        {sortedExperiments.length === 0 && (
+          <div className="mt-10 rounded-lg border border-gray-200 bg-white p-6 text-sm text-gray-600">
+            当前没有可展示的实验数据（/public/_mock 或 data-loader 返回为空）。
+          </div>
+        )}
       </div>
-      
-      {/* Footer - 弱化的联系信息 */}
+
+      {/* Footer */}
       <footer className="mt-12 py-6 border-t border-gray-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <span className="text-xs text-gray-500">AI Recommendation Ads Demo</span>
@@ -184,10 +196,7 @@ export default async function Home() {
 
       {/* Debug Panel */}
       <Suspense fallback={null}>
-        <DebugPanel
-          experimentsCount={total}
-          dataSource="/_mock/index.json"
-        />
+        <DebugPanel experimentsCount={total} dataSource="/_mock/index.json" />
       </Suspense>
     </div>
   )

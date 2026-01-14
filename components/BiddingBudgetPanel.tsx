@@ -33,7 +33,6 @@ function normalizePair(v: any): VariantPair<number | string> | null {
 function PanelInner({ data, narrative, pipeline }: BiddingBudgetPanelProps) {
   const searchParams = useSearchParams()
   const activeTab = parseTab(searchParams?.get('tab'))
-
   const narrativeText = typeof narrative === 'string' ? narrative : ''
   const narrativeFirstLine =
     narrativeText.split('。')[0] || (narrativeText ? narrativeText.substring(0, 50) : '暂无结论')
