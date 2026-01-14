@@ -130,34 +130,34 @@ export default async function Home() {
   const normalCount = sortedExperiments.filter((e) => e.status?.status === 'NORMAL').length
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-blue-25 to-white">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 border-b border-blue-700 shadow-lg relative overflow-hidden wave-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">搜广推实验控制台</h1>
-              <p className="mt-2 text-sm sm:text-base text-gray-600">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">搜广推实验控制台</h1>
+              <p className="mt-2 text-sm sm:text-base text-blue-100">
                 统一查看实验结果、护栏风险、瓶颈诊断与策略建议
               </p>
             </div>
 
             <div className="shrink-0 flex items-center gap-2">
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-gray-50 text-gray-700 border-gray-200">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-blue-300 bg-opacity-30 text-white border-blue-200">
                 总实验 {total}
               </span>
               <span
-                className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusDisplay('ALERT').color}`}
+                className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-red-500 bg-opacity-80 text-white border-red-400`}
               >
                 异常 {alertCount}
               </span>
               <span
-                className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusDisplay('WARNING').color}`}
+                className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-yellow-500 bg-opacity-80 text-white border-yellow-400`}
               >
                 关注 {warningCount}
               </span>
               <span
-                className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusDisplay('NORMAL').color}`}
+                className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-green-500 bg-opacity-80 text-white border-green-400`}
               >
                 正常 {normalCount}
               </span>
@@ -167,7 +167,7 @@ export default async function Home() {
       </div>
 
       {/* Experiments grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative z-10">
         <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
           {sortedExperiments.map((exp) => (
             <ExperimentSummaryCard
@@ -180,17 +180,17 @@ export default async function Home() {
         </div>
 
         {sortedExperiments.length === 0 && (
-          <div className="mt-10 rounded-lg border border-gray-200 bg-white p-6 text-sm text-gray-600">
+          <div className="mt-10 rounded-lg border border-blue-200 bg-white p-6 text-sm text-blue-600">
             当前没有可展示的实验数据（/public/_mock 或 data-loader 返回为空）。
           </div>
         )}
       </div>
 
       {/* Footer */}
-      <footer className="mt-12 py-6 border-t border-gray-200 bg-white">
+      <footer className="mt-12 py-6 border-t border-blue-200 bg-white bg-opacity-50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <span className="text-xs text-gray-500">AI Recommendation Ads Demo</span>
-          <span className="text-xs text-gray-400">Data Source: /public/_mock</span>
+          <span className="text-xs text-blue-600">AI Recommendation Ads Demo</span>
+          <span className="text-xs text-blue-400">Data Source: /public/_mock</span>
         </div>
       </footer>
 

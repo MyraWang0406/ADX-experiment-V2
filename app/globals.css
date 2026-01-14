@@ -2,11 +2,68 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 蓝色系主题 */
+@layer base {
+  body {
+    @apply bg-gradient-to-b from-blue-50 to-white text-gray-900;
+  }
+}
 
+@layer components {
+  /* 主要背景色 */
+  .bg-primary {
+    @apply bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600;
+  }
 
+  /* 次要背景色 */
+  .bg-secondary {
+    @apply bg-blue-50;
+  }
 
+  /* 卡片背景 */
+  .card-bg {
+    @apply bg-white border border-blue-100 shadow-md hover:shadow-lg transition-shadow;
+  }
 
+  /* 蓝色渐变文本 */
+  .text-gradient-blue {
+    @apply bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent;
+  }
 
+  /* 蓝色按钮样式 */
+  .btn-primary {
+    @apply px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all shadow-md hover:shadow-lg;
+  }
 
+  .btn-secondary {
+    @apply px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-medium hover:bg-blue-200 transition-colors;
+  }
 
+  /* 蓝色边框 */
+  .border-primary {
+    @apply border-blue-200;
+  }
 
+  /* 蓝色悬停效果 */
+  .hover-blue {
+    @apply hover:bg-blue-50 hover:border-blue-300 transition-colors;
+  }
+
+  /* 水波背景效果 */
+  .wave-background {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .wave-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120'%3E%3Cpath d='M0,50 Q300,0 600,50 T1200,50 L1200,120 L0,120 Z' fill='%2393c5fd' opacity='0.2'/%3E%3Cpath d='M0,60 Q300,30 600,60 T1200,60 L1200,120 L0,120 Z' fill='%23bfdbfe' opacity='0.1'/%3E%3C/svg%3E") no-repeat bottom;
+    background-size: cover;
+    pointer-events: none;
+  }
+}
