@@ -90,8 +90,15 @@ export default function ExperimentHeader({ experiment }: ExperimentHeaderProps) 
   if (isCollapsed) {
     // 折叠状态：一行显示关键信息（实验ID/标题/目标/提升/风险/卡点/更新时间）
     return (
-      <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="sticky top-0 z-50 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 border-b border-blue-700 shadow-lg relative overflow-hidden">
+        {/* 水波背景效果 */}
+        <div className="absolute inset-0 opacity-20">
+          <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,50 Q300,0 600,50 T1200,50 L1200,120 L0,120 Z" fill="currentColor" className="text-blue-300" />
+            <path d="M0,60 Q300,30 600,60 T1200,60 L1200,120 L0,120 Z" fill="currentColor" className="text-blue-200" opacity="0.5" />
+          </svg>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-3 flex-1 min-w-0 overflow-x-auto">
               <Link
@@ -101,43 +108,43 @@ export default function ExperimentHeader({ experiment }: ExperimentHeaderProps) 
                 ←
               </Link>
               {/* 【防 500】使用可选链和 fallback，确保 experiment_id 和 title 存在 */}
-              <span className="text-xs sm:text-sm text-gray-500 font-mono flex-shrink-0">{experiment?.experiment_id || '未知'}</span>
-              <span className="text-gray-300 flex-shrink-0">|</span>
-              <h1 className="text-sm sm:text-base font-bold text-gray-900 truncate flex-shrink-0">
+              <span className="text-xs sm:text-sm text-blue-100 font-mono flex-shrink-0">{experiment?.experiment_id || '未知'}</span>
+              <span className="text-blue-200 flex-shrink-0">|</span>
+              <h1 className="text-sm sm:text-base font-bold text-white truncate flex-shrink-0">
                 {experiment?.title || '未知实验'}
               </h1>
-              <span className="text-gray-300 flex-shrink-0">|</span>
-              <span className="text-xs sm:text-sm text-gray-600 flex-shrink-0">目标:</span>
-              <span className="text-xs sm:text-sm text-gray-900 flex-shrink-0">{target}</span>
-              <span className="text-gray-300 flex-shrink-0">|</span>
-              <span className="text-xs sm:text-sm text-gray-600 flex-shrink-0">提升:</span>
+              <span className="text-blue-200 flex-shrink-0">|</span>
+              <span className="text-xs sm:text-sm text-blue-100 flex-shrink-0">目标:</span>
+              <span className="text-xs sm:text-sm text-white flex-shrink-0">{target}</span>
+              <span className="text-blue-200 flex-shrink-0">|</span>
+              <span className="text-xs sm:text-sm text-blue-100 flex-shrink-0">提升:</span>
               <span className={`text-xs sm:text-sm font-semibold flex-shrink-0 ${
-                uplift.startsWith('+') ? 'text-blue-600' : 
-                uplift.startsWith('-') ? 'text-red-600' : 
-                'text-gray-400'
+                uplift.startsWith('+') ? 'text-green-200' : 
+                uplift.startsWith('-') ? 'text-red-200' : 
+                'text-blue-100'
               }`}>{uplift}</span>
               {riskGuardrails.length > 0 && (
                 <>
-                  <span className="text-gray-300 flex-shrink-0">|</span>
-                  <span className="px-1.5 py-0.5 bg-red-100 text-red-700 rounded text-xs flex-shrink-0">
+                  <span className="text-blue-200 flex-shrink-0">|</span>
+                  <span className="px-1.5 py-0.5 bg-red-500 bg-opacity-80 text-white rounded text-xs flex-shrink-0 font-medium">
                     风险:{riskGuardrails.length}
                   </span>
                 </>
               )}
               {bottleneck && (
                 <>
-                  <span className="text-gray-300 flex-shrink-0">|</span>
-                  <span className="px-1.5 py-0.5 bg-orange-100 text-orange-700 rounded text-xs flex-shrink-0">
+                  <span className="text-blue-200 flex-shrink-0">|</span>
+                  <span className="px-1.5 py-0.5 bg-orange-500 bg-opacity-80 text-white rounded text-xs flex-shrink-0 font-medium">
                     卡点:{bottleneck.stage || bottleneck.node || '未知'}
                   </span>
                 </>
               )}
-              <span className="text-gray-300 flex-shrink-0">|</span>
-              <span className="text-xs text-gray-500 flex-shrink-0">{lastUpdated}</span>
+              <span className="text-blue-200 flex-shrink-0">|</span>
+              <span className="text-xs text-blue-100 flex-shrink-0">{lastUpdated}</span>
             </div>
             <button
               onClick={() => setIsCollapsed(false)}
-              className="ml-2 text-gray-600 hover:text-gray-900 text-xs sm:text-sm flex-shrink-0"
+              className="ml-2 text-white hover:text-blue-100 text-xs sm:text-sm flex-shrink-0 font-medium transition-colors"
             >
               展开
             </button>
@@ -149,22 +156,29 @@ export default function ExperimentHeader({ experiment }: ExperimentHeaderProps) 
 
   // 展开状态：完整显示
   return (
-    <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+    <div className="sticky top-0 z-50 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 border-b border-blue-700 shadow-lg relative overflow-hidden">
+      {/* 水波背景效果 */}
+      <div className="absolute inset-0 opacity-20">
+        <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 1200 120" preserveAspectRatio="none">
+          <path d="M0,50 Q300,0 600,50 T1200,50 L1200,120 L0,120 Z" fill="currentColor" className="text-blue-300" />
+          <path d="M0,60 Q300,30 600,60 T1200,60 L1200,120 L0,120 Z" fill="currentColor" className="text-blue-200" opacity="0.5" />
+        </svg>
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 relative z-10">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div className="flex-1 min-w-0">
             <Link
               href="/"
-              className="inline-block mb-2 text-blue-600 hover:text-blue-800 transition-colors text-sm sm:text-base"
+              className="inline-block mb-2 text-white hover:text-blue-100 transition-colors text-sm sm:text-base font-medium"
             >
               ← 返回实验列表
             </Link>
-            {/* 【防 500】使用可选链和 fallback，确保所有字段安全访问 */}
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+            {/* 【防 500】使用可选鏁和 fallback，确保所有字段安全访问 */}
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
               {experiment?.experiment_id || '未知'}: {experiment?.title || '未知实验'}
             </h1>
-            <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 line-clamp-2">{experiment?.narrative || ''}</p>
-            <div className="text-xs sm:text-sm text-gray-500">
+            <p className="text-sm sm:text-base text-blue-100 mb-3 sm:mb-4 line-clamp-2">{experiment?.narrative || ''}</p>
+            <div className="text-xs sm:text-sm text-blue-100">
               {/* 【防 500】安全解析日期 */}
               <p>创建时间: {(() => {
                 try {
@@ -180,15 +194,15 @@ export default function ExperimentHeader({ experiment }: ExperimentHeaderProps) 
               <p>主要用户群: {experiment?.primary_segment?.name || '未知'}</p>
             </div>
           </div>
-          <div className="w-full sm:w-auto flex-shrink-0">
+          <div className="w-full sm:w-auto flex-shrink-0 relative z-10">
             <AIReflection experimentData={experiment} />
           </div>
         </div>
         {!isCollapsed && (
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-end relative z-10">
             <button
               onClick={() => setIsCollapsed(true)}
-              className="text-gray-600 hover:text-gray-900 text-sm"
+              className="text-white hover:text-blue-100 text-sm font-medium transition-colors"
             >
               收起
             </button>
