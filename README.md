@@ -1,3 +1,29 @@
+# ADX-experiment-V2
+
+> ⚠️ **This repository is a work in progress.** Core functionality is under development.  
+> For the production ADX simulation and AI diagnostic agent, see [ADX-Mirix-1.15-cursor](https://github.com/MyraWang0406/ADX-Mirix-1.15-cursor).
+
+---
+
+An experimental dashboard for visualizing programmatic advertising experiment data — A/B test results, metric comparisons, and decision support for ad system operators.
+
+## Status
+
+| Component | Status |
+|-----------|--------|
+| Data visualization framework | 🔧 In progress |
+| Experiment comparison views | 🔧 In progress |
+| Decision support integration | 📋 Planned |
+
+## Tech Stack
+
+Next.js 14 · TypeScript · Tailwind CSS · Recharts
+
+## Related
+
+- [ADX-Mirix-1.15-cursor](https://github.com/MyraWang0406/ADX-Mirix-1.15-cursor) — production ADX simulation with whitebox logging and AI diagnostic agent
+
+
 # AI 搜广推实验可视化 Dashboard
 
 基于 Next.js 14 App Router 构建的实验数据可视化平台，用于分析和展示广告实验数据。
