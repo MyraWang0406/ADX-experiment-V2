@@ -86,11 +86,6 @@ npm start
 └── scripts/               # 工具脚本
 ```
 
-## 联系作者
-
-- 邮箱: myrawzm0406@163.com
-- 电话: 15301052620
-
 ## License
 
 Private
